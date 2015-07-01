@@ -1,0 +1,118 @@
+
+RSpec.describe 'Stack' do
+
+  include_context 'cloudformation stubs'
+
+  let(:vpc_template) { instance_double('Template', filename: 'vpc.json', body: 'vpc_template_body') }
+  let(:app_template) { instance_double('Template', filename: 'app.json', body: 'app_template_body') }
+  let(:database_template) { instance_double('Template', filename: 'database.json', body: 'database_template_body') }
+
+  before(:each) do
+    allow(cloudformation).to receive(:list_stacks).and_return(
+      list_stacks_with('uat-vpc': 'CREATE_COMPLETE', 'uat-database': 'UPDATE_FAILED')
+    )
+    allow(Template).to receive(:new).with('vpc.json').and_return(vpc_template)
+    allow(Template).to receive(:new).with('app.json').and_return(app_template)
+    allow(Template).to receive(:new).with('database.json').and_return(database_template)
+    CloudSeed.configure(stack_prefix: nil)
+  end
+
+  describe '#qualified_name' do
+
+    context 'when no env has been specified' do
+      subject { Stack.new('app').qualified_name }
+      it { is_expected.to eql('app') }
+    end
+
+    context 'when no env has been specified but a global stack prefix is configured' do
+      before(:each) { CloudSeed.configure(stack_prefix: 'goodcorp') }
+      subject { Stack.new('app').qualified_name }
+      it { is_expected.to eql('goodcorp-app') }
+    end
+
+    context 'when an env has been specified' do
+      subject { Stack.new('app', env: 'prod').qualified_name }
+      it { is_expected.to eql('prod-app') }
+    end
+
+    context 'when an env has been specified and a global stack prefix is configured' do
+      before(:each) { CloudSeed.configure(stack_prefix: 'goodcorp') }
+      subject { Stack.new('app', env: 'prod').qualified_name }
+      it { is_expected.to eql('goodcorp-prod-app') }
+    end
+
+  end
+
+  describe '#create_or_update' do
+    before(:each) do
+      allow(cloudformation).to receive(:create_stack).and_return({})
+      allow(cloudformation).to receive(:update_stack).and_return({})
+    end
+
+    it 'should derive the template filename from the stack name' do
+      expect(Template).to receive(:new).with('vpc.json')
+      Stack.new('vpc')
+    end
+
+    it 'should allow setting an explicit template filename' do
+      explicit_template = instance_double('Template', filename: 'explicit.json', body: 'explicit_template_body')
+      allow(Template).to receive(:new).with('explicit.json').and_return(explicit_template)
+
+      expect(cloudformation).to receive(:create_stack).with hash_including(template_body: 'explicit_template_body')
+      Stack.new('app', template_filename: 'explicit.json').create_or_update
+    end
+
+    it 'should update the stack where one exists with the same qualified name' do
+      expect(cloudformation).to receive(:update_stack).and_return({})
+      Stack.new('vpc', env: 'uat').create_or_update
+    end
+
+    it 'should create a new stack when none exists with the same qualified name' do
+      expect(cloudformation).to receive(:create_stack).and_return({})
+      Stack.new('app', env: 'uat').create_or_update
+    end
+
+    it 'should refuse to work with a stack in a failed state' do
+      expect { Stack.new('database', env: 'uat').create_or_update }.to raise_error(StandardError)
+    end
+
+    context 'when configuring stack creation' do
+
+      it 'should use the correct template_body' do
+        expect(cloudformation).to receive(:create_stack).with hash_including(template_body: 'app_template_body')
+        Stack.new('app').create_or_update
+      end
+
+      context 'and parameters have been specified' do
+        it 'should pass the correct template_parameters' do
+          input_parameters = { AMIId: 'ami-67e89f89', ASGMinSize: 1, ASGMaxSize: 4, ASGDesiredCapacity: 2 }
+          allow(app_template).to receive(:parameter?) do |parameter_key|
+            input_parameters.keys.include?(parameter_key)
+          end
+
+          expected_parameters = input_parameters.map { |key, value| { parameter_key: key, parameter_value: value } }
+          expect(cloudformation).to receive(:create_stack).with hash_including(parameters: expected_parameters)
+
+          stack = Stack.new('app', parameters: input_parameters)
+          stack.create_or_update
+        end
+      end
+
+    end
+  end
+
+  describe '#output' do
+
+    let(:outputs) { { VPCCId: 'vpc-72895717', PublicSubnetId: 'subnet-0f3a896a' } }
+
+    before(:each) do
+      allow(cloudformation).to receive(:describe_stacks).and_return(describe_stacks_with(outputs))
+    end
+
+    it "should provide a stack's outputs by name" do
+      expect(Stack.new('vpc', env: 'uat').output(:VPCCId)).to eq(outputs[:VPCCId])
+    end
+
+  end
+
+end
