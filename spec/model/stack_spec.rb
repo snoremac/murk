@@ -43,6 +43,27 @@ RSpec.describe 'Stack' do
 
   end
 
+  describe '#add_parameter' do
+
+    let(:valid_parameters) { %i(AMIId ASGMinSize ASGMaxSize ASGDesiredCapacity) }
+    let(:stack) { Stack.new('app') }
+
+    it 'should accept parameters that are declared in the template' do
+      allow(app_template).to receive(:parameter?) do |parameter_key|
+        valid_parameters.include?(parameter_key)
+      end
+      valid_parameters.each do |param|
+        stack.add_parameter(param, 'value')
+      end
+    end
+
+    it 'should not accept parameters that are not declared in the template' do
+      allow(app_template).to receive(:parameter?).with(:Invalid).and_return(false)
+      expect { stack.add_parameter(:Invalid, 'value') }.to raise_error(StackError)
+    end
+
+  end
+
   describe '#create_or_update' do
     before(:each) do
       allow(cloudformation).to receive(:create_stack).and_return({})
@@ -84,7 +105,7 @@ RSpec.describe 'Stack' do
       end
 
       context 'and parameters have been specified' do
-        it 'should pass the correct template_parameters' do
+        it 'should pass the stack parameters' do
           input_parameters = { AMIId: 'ami-67e89f89', ASGMinSize: 1, ASGMaxSize: 4, ASGDesiredCapacity: 2 }
           allow(app_template).to receive(:parameter?) do |parameter_key|
             input_parameters.keys.include?(parameter_key)
@@ -93,7 +114,8 @@ RSpec.describe 'Stack' do
           expected_parameters = input_parameters.map { |key, value| { parameter_key: key, parameter_value: value } }
           expect(cloudformation).to receive(:create_stack).with hash_including(parameters: expected_parameters)
 
-          stack = Stack.new('app', parameters: input_parameters)
+          stack = Stack.new('app')
+          input_parameters.each { |key, value| stack.add_parameter(key, value) }
           stack.create_or_update
         end
       end

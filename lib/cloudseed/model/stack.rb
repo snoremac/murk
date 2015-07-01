@@ -11,47 +11,24 @@ module CloudSeed
 
       attr_reader :name
 
-      def initialize(name, env: nil, parameters: {}, template_filename: name + '.json')
+      def initialize(name, env: nil, template_filename: name + '.json')
         @name = name
         @env = env
-        @parameters = parameters
         @template = Template.new(template_filename)
+        @parameters = {}
       end
 
-      # rubocop:disable Metrics/MethodLength
+      def add_parameter(key, value)
+        if @template.parameter?(key)
+          @parameters[key] = value
+        else
+          fail StackError, "No such parameter '#{key}' for template '#{@template.filename}'"
+        end
+      end
+
       def create_or_update
-        fail "Stack '#{@name}' is in failed state" if failed?
-
-        begin
-          if exists?
-            response = cloudformation.update_stack(config)
-          else
-            response = cloudformation.create_stack(config)
-          end
-        rescue Aws::CloudFormation::Errors::ValidationError => e
-          if e.message =~ /No updates are to be performed/
-            return
-          else
-            raise e
-          end
-        end
-        response[:stack_id]
-      end
-      # rubocop:enable Metrics/MethodLength
-
-      def config
-        {
-          stack_name: qualified_name,
-          template_body: @template.body,
-          capabilities: ['CAPABILITY_IAM'],
-          parameters: @parameters.map { |key, value| { parameter_key: key, parameter_value: value } }
-        }
-      end
-
-      def existing
-        cloudformation.list_stacks.stack_summaries.select do |stack|
-          stack.stack_name == qualified_name && stack.stack_status != 'DELETE_COMPLETE'
-        end
+        fail StackError, "Stack '#{@name}' is in failed state" if failed?
+        exists? ? update : create
       end
 
       def exists?
@@ -82,6 +59,43 @@ module CloudSeed
         output ? output.output_value : nil
       end
 
+      private
+
+      def create
+        cloudformation.create_stack(config)
+      rescue Aws::CloudFormation::Errors::ValidationError
+        raise StackError, "Failed to create stack #{@name}"
+      end
+
+      def update
+        cloudformation.update_stack(config)
+      rescue Aws::CloudFormation::Errors::ValidationError
+        if e.message =~ /No updates are to be performed/
+          return
+        else
+          raise StackError, "Failed to update stack #{@name}"
+        end
+      end
+
+      def existing
+        cloudformation.list_stacks.stack_summaries.select do |stack|
+          stack.stack_name == qualified_name && stack.stack_status != 'DELETE_COMPLETE'
+        end
+      end
+
+      def config
+        {
+          stack_name: qualified_name,
+          template_body: @template.body,
+          capabilities: ['CAPABILITY_IAM'],
+          parameters: @parameters.map { |key, value| { parameter_key: key, parameter_value: value } }
+        }
+      end
+
     end
+
+    class StackError < StandardError
+    end
+
   end
 end

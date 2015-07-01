@@ -8,6 +8,7 @@ require 'cloudseed'
 Stack = CloudSeed::Model::Stack
 Template = CloudSeed::Model::Template
 TemplateError = CloudSeed::Model::TemplateError
+StackError = CloudSeed::Model::StackError
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|

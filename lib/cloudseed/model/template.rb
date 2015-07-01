@@ -49,5 +49,9 @@ module CloudSeed
       end
 
     end
+
+    class TemplateError < StandardError
+    end
+
   end
 end
