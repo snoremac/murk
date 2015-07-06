@@ -9,7 +9,7 @@ module CloudSeed
       include CloudSeed
       include CloudSeed::AWS
 
-      attr_reader :name
+      attr_reader :name, :env
 
       def initialize(name, env: nil, template_filename: name + '.json')
         @name = name

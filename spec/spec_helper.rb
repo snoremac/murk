@@ -6,6 +6,7 @@ require 'aws-sdk'
 require 'cloudseed'
 
 Stack = CloudSeed::Model::Stack
+StackCollection = CloudSeed::Model::StackCollection
 Template = CloudSeed::Model::Template
 TemplateError = CloudSeed::Model::TemplateError
 StackError = CloudSeed::Model::StackError
@@ -15,6 +16,7 @@ RSpec.configure do |config|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
   end
   config.mock_with :rspec do |mocks|
+    mocks.verify_doubled_constant_names = true
     mocks.verify_partial_doubles = true
   end
   config.filter_run :focus
