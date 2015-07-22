@@ -35,8 +35,9 @@ module CloudSeed
       def resolve_path(filename)
         template_paths = CloudSeed.options[:template_path].split(':')
         template_paths.each do |path|
-          if File.exist?(File.join(path, filename))
-            return File.join(path, filename)
+          real_path = File.absolute_path(path, CloudSeed.config_dir)
+          if File.exist?(File.join(real_path, filename))
+            return File.join(real_path, filename)
           end
         end
         fail TemplateError, "Template '#{filename}' not found in path #{CloudSeed.options[:template_path]}"

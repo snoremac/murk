@@ -29,7 +29,19 @@ module CloudSeed
       log.progname = 'CloudSeed'
     end
   end
+
+  def self.config_file
+    @@config_file ||= File.absolute_path('./config')
+  end
+
+  def self.config_file=(config_file)
+    @@config_file = config_file
+  end
   # rubocop:ensable Style/ClassVars
+
+  def self.config_dir
+    File.dirname(self.config_file)
+  end
 
   def logger
     CloudSeed.logger

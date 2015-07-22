@@ -18,6 +18,13 @@ RSpec.describe 'Template' do
       expect(subject).to eq('/tmp/templates-1/vpc.json')
     end
 
+    it 'should resolve relative paths against the location of the configuration file' do
+      FileUtils.touch(['/tmp/templates-1/vpc.json'])
+      CloudSeed.config_file = '/tmp/cloudseed.rb'
+      CloudSeed.configure(template_path: 'templates-1')
+      expect(subject).to eq('/tmp/templates-1/vpc.json')
+    end
+
     it 'should raise an exception if the template isn\'t found' do
       expect { Template.new('nowhere.json').path }.to raise_error(TemplateError)
     end
