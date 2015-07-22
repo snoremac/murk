@@ -1,0 +1,72 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
+
+require 'logger'
+require 'optparse'
+require 'ostruct'
+
+require 'cloudseed'
+
+DEFAULT_CONFIG_FILE = './config/cloudseed.rb'
+
+def create(options)
+  stack_name = ARGV[1]
+  stacks = CloudSeed.load(options.file)
+  stack = stacks.find_by_name(stack_name, env: ENV['CLOUDSEED_ENV'] || ENV['USER'])
+  if stack
+    stack.create_or_update
+  else
+    fail ArgumentError, 'No stack defined with name ' + stack_name
+  end
+rescue StandardError => e
+  fail_with_exception(e, options.debug)
+end
+
+def fail_with_usage(parser)
+  $stderr.puts parser
+  exit 1
+end
+
+def fail_with_exception(e, debug)
+  $stderr.puts e.message
+  if debug
+    $stderr.puts e.backtrace
+  end
+  exit 2
+end
+
+options = OpenStruct.new
+options.file = DEFAULT_CONFIG_FILE
+options.debug = false
+
+parser = OptionParser.new do |p|
+  p.banner = 'Usage: stack [options] [ create | delete ] STACK'
+
+  p.on('-f', '--file FILE', 'Stack configuration file') do |file|
+    options.file = file
+  end
+
+  p.on('-d', '--debug', 'Show extra debugging output') do |debug|
+    options.debug = debug
+    CloudSeed.logger.level = Logger::DEBUG
+  end
+end
+
+begin
+  parser.parse!(ARGV)
+rescue OptionParser::ParseError
+  fail_with_usage(parser)
+end
+
+fail_with_usage(parser) unless ARGV.length >= 2
+
+if ARGV[0] == 'create'
+  create(options)
+elsif ARGV[0] == 'delete'
+  delete(options)
+else
+  fail_with_usage(parser)
+end
+
+exit 0

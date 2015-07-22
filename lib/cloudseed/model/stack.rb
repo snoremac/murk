@@ -26,6 +26,10 @@ module CloudSeed
         end
       end
 
+      def parameter_value(parameter_key)
+        @parameters[parameter_key]
+      end
+
       def create_or_update
         fail StackError, "Stack '#{@name}' is in failed state" if failed?
         exists? ? update : create

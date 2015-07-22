@@ -1,4 +1,6 @@
 
+# TODO: Validate the template even when no parameters are given
+
 RSpec.describe 'Stack' do
 
   include_context 'cloudformation stubs'

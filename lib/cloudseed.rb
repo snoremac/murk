@@ -16,6 +16,14 @@ module CloudSeed
     @options ||= DEFAULT_OPTIONS
   end
 
+  def self.load(file)
+    self.config_file = file
+    config = File.read(config_file)
+    builder = CloudSeed::Builder::CloudSeedBuilder.new
+    builder.instance_eval(config)
+    builder.build
+  end
+
   # rubocop:disable Style/ClassVars
   def self.logger
     @@logger ||= Logger.new(STDOUT).tap do |log|
@@ -40,7 +48,7 @@ module CloudSeed
   # rubocop:ensable Style/ClassVars
 
   def self.config_dir
-    File.dirname(self.config_file)
+    File.dirname(config_file)
   end
 
   def logger
