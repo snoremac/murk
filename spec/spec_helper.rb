@@ -5,6 +5,9 @@ require 'pry'
 require 'aws-sdk'
 require 'cloudseed'
 
+CloudSeedBuilder = CloudSeed::Builder::CloudSeedBuilder
+StackBuilder = CloudSeed::Builder::StackBuilder
+
 Stack = CloudSeed::Model::Stack
 StackCollection = CloudSeed::Model::StackCollection
 Template = CloudSeed::Model::Template
