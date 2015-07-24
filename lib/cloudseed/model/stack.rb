@@ -35,6 +35,11 @@ module CloudSeed
         exists? ? update : create
       end
 
+      def delete
+        fail StackError "Stack #{@name} does not exist" unless exists?
+        cloudformation.delete_stack(stack_name: qualified_name)
+      end
+
       def exists?
         existing.any?
       end

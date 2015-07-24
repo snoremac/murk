@@ -175,6 +175,13 @@ RSpec.describe 'Stack' do
     end
   end
 
+  describe '#delete' do
+    it 'should delete the stack using the qualified name' do
+      expect(cloudformation).to receive(:delete_stack).with(stack_name: 'uat-vpc')
+      Stack.new('vpc', env: 'uat').delete
+    end
+  end
+
   describe '#output' do
 
     let(:outputs) { { VPCCId: 'vpc-72895717', PublicSubnetId: 'subnet-0f3a896a' } }
