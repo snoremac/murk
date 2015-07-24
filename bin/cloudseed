@@ -29,9 +29,11 @@ def fail_with_usage(parser)
 end
 
 def fail_with_exception(e, debug)
+  cause = e.cause || e
   $stderr.puts e.message
+  $stderr.puts cause.message
   if debug
-    $stderr.puts e.backtrace
+    $stderr.puts cause.backtrace
   end
   exit 2
 end
