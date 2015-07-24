@@ -5,8 +5,8 @@ RSpec.describe 'Stack' do
 
   include_context 'cloudformation stubs'
 
-  let(:vpc_template) { instance_double('Template', filename: 'vpc.json', body: 'vpc_template_body') }
-  let(:app_template) { instance_double('Template', filename: 'app.json', body: 'app_template_body') }
+  let(:vpc_template) { instance_double('Template', filename: 'vpc.json', body: 'vpc_template_body', parameter?: true) }
+  let(:app_template) { instance_double('Template', filename: 'app.json', body: 'app_template_body', parameter?: true) }
   let(:database_template) { instance_double('Template', filename: 'database.json', body: 'database_template_body') }
 
   before(:each) do
@@ -78,7 +78,9 @@ RSpec.describe 'Stack' do
     end
 
     it 'should allow setting an explicit template filename' do
-      explicit_template = instance_double('Template', filename: 'explicit.json', body: 'explicit_template_body')
+      explicit_template = instance_double(
+        'Template', filename: 'explicit.json', body: 'explicit_template_body', parameter?: true
+      )
       allow(Template).to receive(:new).with('explicit.json').and_return(explicit_template)
 
       expect(cloudformation).to receive(:create_stack).with hash_including(template_body: 'explicit_template_body')
@@ -121,7 +123,55 @@ RSpec.describe 'Stack' do
           stack.create_or_update
         end
       end
+    end
 
+    context 'when passing implicit parameters' do
+
+      let(:template) { instance_double('Template', filename: 'template.json', body: '') }
+
+      before(:each) do
+        allow(Template).to receive(:new).with('template.json').and_return(template)
+        implicit_parameter_keys = [:Prefix, :Name, :Env, :QualifiedName]
+        allow(template).to receive(:parameter?) do |parameter_key|
+          implicit_parameter_keys.include?(parameter_key)
+        end
+      end
+
+      it 'should pass the global stack prefix if a \'Prefix\' parameter is declared' do
+        CloudSeed.configure(stack_prefix: 'cloudseed')
+        expect(cloudformation).to receive(:create_stack) do |config|
+          expect(config[:parameters]).to include(parameter_key: :Prefix, parameter_value: 'cloudseed')
+        end
+        stack = Stack.new('template')
+        stack.create_or_update
+      end
+
+      it 'should pass the stack name if a \'Name\' parameter is declared' do
+        expect(cloudformation).to receive(:create_stack) do |config|
+          expect(config[:parameters]).to include(parameter_key: :Name, parameter_value: 'template')
+        end
+        stack = Stack.new('template')
+        stack.create_or_update
+      end
+
+      it 'should pass the stack env if a \'Env\' parameter is declared' do
+        expect(cloudformation).to receive(:create_stack) do |config|
+          expect(config[:parameters]).to include(parameter_key: :Env, parameter_value: 'uat')
+        end
+        stack = Stack.new('template', env: 'uat')
+        stack.create_or_update
+      end
+
+      it 'should pass the stack qualified name if a \'QualifiedName\' parameter is declared' do
+        CloudSeed.configure(stack_prefix: 'cloudseed')
+        expect(cloudformation).to receive(:create_stack) do |config|
+          expect(config[:parameters]).to include(
+            parameter_key: :QualifiedName, parameter_value: 'cloudseed-uat-template'
+          )
+        end
+        stack = Stack.new('template', env: 'uat')
+        stack.create_or_update
+      end
     end
   end
 

@@ -2,6 +2,22 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "CloudSeed VPC example",
   "Parameters": {
+    "Prefix": {
+      "Type": "String",
+      "AllowedPattern": "[a-z][a-z0-9\\-]*"
+    },
+    "Env": {
+      "Type": "String",
+      "AllowedPattern": "[a-z][a-z0-9\\-]*"
+    },
+    "Name": {
+      "Type": "String",
+      "AllowedPattern": "[a-z][a-z0-9\\-]*"
+    },
+    "QualifiedName": {
+      "Type": "String",
+      "AllowedPattern": "[a-z][a-z0-9\\-]*"
+    },
     "VPCCIDR": {
       "Type" : "String"
     },
@@ -18,7 +34,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "cloudseed-vpc-example"
+            "Value": { "Ref": "QualifiedName" }
           }
         ]
       }
@@ -32,7 +48,9 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "cloudseed-vpc-example"
+            "Value": { "Fn::Join" : [ "-", [
+              { "Ref": "Prefix" }, { "Ref": "Env" }, { "Ref": "Name" }, "public"
+            ] ] }
           }
         ]
       }
@@ -43,7 +61,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "cloudseed-vpc-example"
+            "Value": { "Ref": "QualifiedName" }
           }
         ]
       }
@@ -61,7 +79,7 @@
         "VpcId": { "Ref": "VPC" },
         "Tags" : [ {
           "Key" : "Name",
-          "Value": "cloudseed-vpc-example"
+          "Value": { "Ref": "QualifiedName" }
         } ]
       }
     },

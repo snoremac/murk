@@ -88,12 +88,22 @@ module CloudSeed
       end
 
       def config
+        all_parameters = @parameters.merge(implicit_parameters)
         {
           stack_name: qualified_name,
           template_body: @template.body,
           capabilities: ['CAPABILITY_IAM'],
-          parameters: @parameters.map { |key, value| { parameter_key: key, parameter_value: value } }
+          parameters: all_parameters.map { |key, value| { parameter_key: key, parameter_value: value } }
         }
+      end
+
+      def implicit_parameters
+        implicit_parameters = {}
+        implicit_parameters[:Prefix] = CloudSeed.options[:stack_prefix] if @template.parameter?(:Prefix)
+        implicit_parameters[:Env] = @env if @template.parameter?(:Env)
+        implicit_parameters[:Name] = @name if @template.parameter?(:Name)
+        implicit_parameters[:QualifiedName] = qualified_name if @template.parameter?(:QualifiedName)
+        implicit_parameters
       end
 
     end
