@@ -10,12 +10,12 @@ Gem::Specification.new do |spec|
   spec.bindir      = 'bin'
   spec.executables = ['cloudseed']
 
-  spec.add_runtime_dependency 'api_cache'
+  spec.add_runtime_dependency 'api_cache', '~> 0.3'
   spec.add_runtime_dependency 'aws-sdk', '~> 2.1'
-  spec.add_runtime_dependency 'json'
+  spec.add_runtime_dependency 'json', '~> 1.8'
 
-  spec.add_development_dependency 'pry'
-  spec.add_development_dependency 'rubocop'
-  spec.add_development_dependency 'rspec'
-  spec.add_development_dependency 'simplecov'
+  spec.add_development_dependency 'pry', '~> 0.10'
+  spec.add_development_dependency 'rubocop', '~> 0.32'
+  spec.add_development_dependency 'rspec', '~> 3.3'
+  spec.add_development_dependency 'simplecov', '~> 0.10'
 end
