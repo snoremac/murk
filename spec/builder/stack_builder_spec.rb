@@ -1,4 +1,6 @@
 
+# TODO: Test setting of reference stack parameters
+
 RSpec.describe 'StackBuilder' do
 
   describe '#build' do
@@ -13,11 +15,11 @@ RSpec.describe 'StackBuilder' do
       StackBuilder.new('vpc', env: 'dev').build
     end
 
-    it 'should set the stack parameters' do
+    it 'should set simple stack parameters' do
       stack = instance_double('Stack')
       expect(Stack).to receive(:new).and_return(stack)
-      expect(stack).to receive(:add_parameter).with(:VPCCIDR, '10.0.0.0/16')
-      expect(stack).to receive(:add_parameter).with(:PublicSubnetACIDR, '10.0.0.0/24')
+      expect(stack).to receive(:add_parameter).with(SimpleStackParameter.new(:VPCCIDR, '10.0.0.0/16'))
+      expect(stack).to receive(:add_parameter).with(SimpleStackParameter.new(:PublicSubnetACIDR, '10.0.0.0/24'))
       params = proc do
         VPCCIDR '10.0.0.0/16'
         PublicSubnetACIDR '10.0.0.0/24'

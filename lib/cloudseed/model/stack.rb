@@ -10,24 +10,25 @@ module CloudSeed
       include CloudSeed::AWS
 
       attr_reader :name, :env
+      attr_accessor :collection
 
       def initialize(name, env: nil, template_filename: name + '.json')
         @name = name
         @env = env
         @template = Template.new(template_filename)
-        @parameters = {}
+        @parameters = []
       end
 
-      def add_parameter(key, value)
-        if @template.parameter?(key)
-          @parameters[key] = value
+      def add_parameter(parameter)
+        if @template.parameter?(parameter.key)
+          @parameters << parameter
         else
-          fail StackError, "No such parameter '#{key}' for template '#{@template.filename}'"
+          fail StackError, "No such parameter '#{parameter.key}' for template '#{@template.filename}'"
         end
       end
 
       def parameter_value(parameter_key)
-        @parameters[parameter_key]
+        @parameters.find { |parameter| parameter.key == parameter_key }.resolve(@collection)
       end
 
       def create_or_update
@@ -93,12 +94,11 @@ module CloudSeed
       end
 
       def config
-        all_parameters = @parameters.merge(implicit_parameters)
         {
           stack_name: qualified_name,
           template_body: @template.body,
           capabilities: ['CAPABILITY_IAM'],
-          parameters: all_parameters.map { |key, value| { parameter_key: key, parameter_value: value } }
+          parameters: implicit_parameters + explicit_parameters
         }
       end
 
@@ -108,7 +108,13 @@ module CloudSeed
         implicit_parameters[:Env] = @env if @template.parameter?(:Env)
         implicit_parameters[:Name] = @name if @template.parameter?(:Name)
         implicit_parameters[:QualifiedName] = qualified_name if @template.parameter?(:QualifiedName)
-        implicit_parameters
+        implicit_parameters.map { |key, value| { parameter_key: key, parameter_value: value } }
+      end
+
+      def explicit_parameters
+        @parameters.map do |parameter|
+          { parameter_key: parameter.key, parameter_value: parameter.resolve(@collection) }
+        end
       end
 
     end

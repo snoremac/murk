@@ -12,8 +12,8 @@ module CloudSeed
 
       def build
         stack = CloudSeed::Model::Stack.new(@stack_name, env: @env)
-        @parameters_builder.build.each do |key, value|
-          stack.add_parameter(key, value)
+        @parameters_builder.build.each do |parameter|
+          stack.add_parameter(parameter)
         end
         stack
       end

@@ -1,0 +1,75 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "CloudSeed ASG example",
+  "Parameters": {
+    "Prefix": {
+      "Type": "String",
+      "AllowedPattern": "[a-z][a-z0-9\\-]*"
+    },
+    "Env": {
+      "Type": "String",
+      "AllowedPattern": "[a-z][a-z0-9\\-]*"
+    },
+    "Name": {
+      "Type": "String",
+      "AllowedPattern": "[a-z][a-z0-9\\-]*"
+    },
+    "QualifiedName": {
+      "Type": "String",
+      "AllowedPattern": "[a-z][a-z0-9\\-]*"
+    },
+    "SubnetId": {
+      "Type" : "String"
+    },
+    "AMIId": {
+      "Type" : "String"
+    },
+    "KeyName": {
+      "Type" : "String"
+    },
+    "ASGMinSize": {
+      "Type" : "String"
+    },
+    "ASGMaxSize": {
+      "Type" : "String"
+    },
+    "ASGDesiredCapacity": {
+      "Type" : "String"
+    }
+  },
+  "Resources": {
+    "LaunchConfig": {
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+      "Properties": {
+        "ImageId": { "Ref" : "AMIId" },
+        "InstanceType": "t2.micro",
+        "KeyName": { "Ref" : "KeyName" },
+        "BlockDeviceMappings" : [
+           {
+             "DeviceName" : "/dev/sda1",
+             "Ebs" : { "VolumeSize" : "12", "VolumeType" : "gp2", "DeleteOnTermination" : "true" }
+           }
+         ]
+      }
+    },
+    "AutoScalingGroup": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "VPCZoneIdentifier": [ {"Ref": "SubnetId"} ],
+        "HealthCheckGracePeriod": 600,
+        "HealthCheckType": "EC2",
+        "LaunchConfigurationName": { "Ref": "LaunchConfig" },
+        "MinSize": { "Ref": "ASGMinSize" },
+        "MaxSize": { "Ref": "ASGMaxSize" },
+        "DesiredCapacity": { "Ref": "ASGDesiredCapacity" },
+        "Tags" : [
+          {
+            "Key" : "Name",
+            "Value" : { "Ref": "QualifiedName" },
+            "PropagateAtLaunch": true
+          }
+        ]
+      }
+    }
+  }
+}

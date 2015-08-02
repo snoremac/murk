@@ -5,14 +5,11 @@ Style/EmptyLinesAroundClassBody:
   Enabled: false
 Style/EmptyLinesAroundModuleBody:
   Enabled: false
-# Style/BlockDelimiters:
-#   Enabled: false
 Style/Documentation:
   Enabled: false
 Style/IfUnlessModifier:
   Enabled: false
-# Style/MultilineBlockLayout:
-#   Enabled: false
-
+Lint/UnusedMethodArgument:
+  Enabled: false  
 Metrics/LineLength:
   Max: 120

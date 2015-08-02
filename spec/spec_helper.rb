@@ -10,6 +10,8 @@ StackBuilder = CloudSeed::Builder::StackBuilder
 
 Stack = CloudSeed::Model::Stack
 StackCollection = CloudSeed::Model::StackCollection
+SimpleStackParameter = CloudSeed::Model::SimpleStackParameter
+ReferenceStackParameter = CloudSeed::Model::ReferenceStackParameter
 Template = CloudSeed::Model::Template
 TemplateError = CloudSeed::Model::TemplateError
 StackError = CloudSeed::Model::StackError

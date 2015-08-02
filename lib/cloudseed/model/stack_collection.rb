@@ -11,6 +11,7 @@ module CloudSeed
 
       def add(stack)
         @stacks << stack
+        stack.collection = self
       end
 
       def each(&block)
@@ -21,6 +22,14 @@ module CloudSeed
         find do |stack|
           stack.name == name && stack.env == env
         end
+      end
+
+      def respond_to?(method_sym)
+        @stacks.any? { |stack| stack.name == method_sym.to_s }
+      end
+
+      def method_missing(method_sym)
+        @stacks.find { |stack| stack.name == method_sym.to_s }
       end
 
     end

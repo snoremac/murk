@@ -55,13 +55,13 @@ RSpec.describe 'Stack' do
         valid_parameters.include?(parameter_key)
       end
       valid_parameters.each do |param|
-        stack.add_parameter(param, 'value')
+        stack.add_parameter(SimpleStackParameter.new(param, 'value'))
       end
     end
 
     it 'should not accept parameters that are not declared in the template' do
       allow(app_template).to receive(:parameter?).with(:Invalid).and_return(false)
-      expect { stack.add_parameter(:Invalid, 'value') }.to raise_error(StackError)
+      expect { stack.add_parameter(SimpleStackParameter.new(:Invalid, 'value')) }.to raise_error(StackError)
     end
 
   end
@@ -119,7 +119,7 @@ RSpec.describe 'Stack' do
           expect(cloudformation).to receive(:create_stack).with hash_including(parameters: expected_parameters)
 
           stack = Stack.new('app')
-          input_parameters.each { |key, value| stack.add_parameter(key, value) }
+          input_parameters.each { |key, value| stack.add_parameter(SimpleStackParameter.new(key, value)) }
           stack.create_or_update
         end
       end
