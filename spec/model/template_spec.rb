@@ -20,8 +20,8 @@ RSpec.describe 'Template' do
 
     it 'should resolve relative paths against the location of the configuration file' do
       FileUtils.touch(['/tmp/templates-1/vpc.json'])
-      CloudSeed.config_file = '/tmp/cloudseed.rb'
-      CloudSeed.configure(template_path: 'templates-1')
+      Murk.config_file = '/tmp/murk.rb'
+      Murk.configure(template_path: 'templates-1')
       expect(subject).to eq('/tmp/templates-1/vpc.json')
     end
 

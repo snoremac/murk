@@ -1,17 +1,17 @@
 
 options do
   # Colon-delimited path specifying where to search for CloudFormation templates
-  # Relative paths are resolved against the directory containing the CloudSeed
+  # Relative paths are resolved against the directory containing the Murk
   # configuration file
   template_path '../cloudformation'
   # An optional, global prefix prepended to all stack names.
-  stack_prefix 'cloudseed'
+  stack_prefix 'murk'
 end
 
 # Stacks in this environment will be named after the current user
 env ENV['USER'] do
 
-  # Cloudseed will search for a template named 'vpc.json' in the paths specified
+  # MURK will search for a template named 'vpc.json' in the paths specified
   # by the template_path option above
   stack 'vpc' do
     parameters do
@@ -26,7 +26,7 @@ env ENV['USER'] do
     parameters do
       AMIId 'ami-e7ee9edd'
       # Reference parameter configuration
-      # This will cause CloudSeed to look up the named output of the referenced stack
+      # This will cause Murk to look up the named output of the referenced stack
       SubnetId { vpc.output(:PublicSubnetId) }
       KeyName ENV['USER']
       ASGMinSize '1'

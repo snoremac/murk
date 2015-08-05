@@ -1,12 +1,12 @@
 
 require 'aws-sdk'
 
-module CloudSeed
+module Murk
   module Model
     class Template
 
-      include CloudSeed
-      include CloudSeed::AWS
+      include Murk
+      include Murk::AWS
 
       attr_reader :filename
 
@@ -33,14 +33,14 @@ module CloudSeed
       private
 
       def resolve_path(filename)
-        template_paths = CloudSeed.options[:template_path].split(':')
+        template_paths = Murk.options[:template_path].split(':')
         template_paths.each do |path|
-          real_path = File.absolute_path(path, CloudSeed.config_dir)
+          real_path = File.absolute_path(path, Murk.config_dir)
           if File.exist?(File.join(real_path, filename))
             return File.join(real_path, filename)
           end
         end
-        fail TemplateError, "Template '#{filename}' not found in path #{CloudSeed.options[:template_path]}"
+        fail TemplateError, "Template '#{filename}' not found in path #{Murk.options[:template_path]}"
       end
 
       def validate

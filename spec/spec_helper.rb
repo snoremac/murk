@@ -3,18 +3,18 @@ require 'simplecov'
 SimpleCov.start
 require 'pry'
 require 'aws-sdk'
-require 'cloudseed'
+require 'murk'
 
-CloudSeedBuilder = CloudSeed::Builder::CloudSeedBuilder
-StackBuilder = CloudSeed::Builder::StackBuilder
+MurkBuilder = Murk::Builder::MurkBuilder
+StackBuilder = Murk::Builder::StackBuilder
 
-Stack = CloudSeed::Model::Stack
-StackCollection = CloudSeed::Model::StackCollection
-SimpleStackParameter = CloudSeed::Model::SimpleStackParameter
-ReferenceStackParameter = CloudSeed::Model::ReferenceStackParameter
-Template = CloudSeed::Model::Template
-TemplateError = CloudSeed::Model::TemplateError
-StackError = CloudSeed::Model::StackError
+Stack = Murk::Model::Stack
+StackCollection = Murk::Model::StackCollection
+SimpleStackParameter = Murk::Model::SimpleStackParameter
+ReferenceStackParameter = Murk::Model::ReferenceStackParameter
+Template = Murk::Model::Template
+TemplateError = Murk::Model::TemplateError
+StackError = Murk::Model::StackError
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
@@ -40,7 +40,7 @@ RSpec.shared_context 'path fixtures' do
       FileUtils.rm_rf(path)
       FileUtils.mkdir_p(path)
     end
-    CloudSeed.configure(template_path: paths.join(':'))
+    Murk.configure(template_path: paths.join(':'))
   end
 end
 
@@ -82,4 +82,4 @@ RSpec.shared_context 'cloudformation stubs' do
   end
 end
 
-CloudSeed.logger = Logger.new(File.dirname(__FILE__) + '/../spec.log')
+Murk.logger = Logger.new(File.dirname(__FILE__) + '/../spec.log')

@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "CloudSeed VPC example",
+  "Description": "Murk VPC example",
   "Parameters": {
     "Prefix": {
       "Type": "String",

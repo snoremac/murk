@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    cloudseed (0.0.0)
+    murk (0.0.0)
       api_cache
       aws-sdk
       json
@@ -66,7 +66,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  cloudseed!
+  murk!
   pry
   rspec
   rubocop

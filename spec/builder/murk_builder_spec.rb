@@ -1,5 +1,5 @@
 
-RSpec.describe 'CloudSeedBuilder' do
+RSpec.describe 'MurkBuilder' do
 
   describe '#build' do
 
@@ -20,15 +20,15 @@ RSpec.describe 'CloudSeedBuilder' do
       let(:options) do
         proc do
           template_path '/tmp'
-          stack_prefix 'cloudseed'
+          stack_prefix 'murk'
         end
       end
 
       it 'should configure global options' do
-        builder = CloudSeedBuilder.new
+        builder = MurkBuilder.new
         builder.options(&options).build
-        expect(CloudSeed.options[:template_path]).to eql('/tmp')
-        expect(CloudSeed.options[:stack_prefix]).to eql('cloudseed')
+        expect(Murk.options[:template_path]).to eql('/tmp')
+        expect(Murk.options[:stack_prefix]).to eql('murk')
       end
 
     end
@@ -40,7 +40,7 @@ RSpec.describe 'CloudSeedBuilder' do
           expect(stack.name).to eql('vpc')
         end
 
-        builder = CloudSeedBuilder.new
+        builder = MurkBuilder.new
         builder.stack('vpc', &proc {}).build
       end
     end
@@ -55,7 +55,7 @@ RSpec.describe 'CloudSeedBuilder' do
           expect(stack.name).to eql('app')
         end
 
-        builder = CloudSeedBuilder.new
+        builder = MurkBuilder.new
         builder.env('qa', &qa_env).build
       end
     end

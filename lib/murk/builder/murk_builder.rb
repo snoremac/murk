@@ -1,8 +1,8 @@
 
-module CloudSeed
+module Murk
   module Builder
 
-    class CloudSeedBuilder
+    class MurkBuilder
 
       def initialize
         @options_builder = OptionsBuilder.new
@@ -30,9 +30,9 @@ module CloudSeed
       end
 
       def build
-        CloudSeed.configure(@options_builder.build)
+        Murk.configure(@options_builder.build)
 
-        stack_collection = CloudSeed::Model::StackCollection.new
+        stack_collection = Murk::Model::StackCollection.new
         @stack_builders.each do |builder|
           stack_collection.add(builder.build)
         end

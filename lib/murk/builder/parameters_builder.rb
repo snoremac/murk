@@ -1,7 +1,7 @@
 
-require 'cloudseed/model/stack_parameter'
+require 'murk/model/stack_parameter'
 
-module CloudSeed
+module Murk
   module Builder
 
     class ParametersBuilder
@@ -20,9 +20,9 @@ module CloudSeed
 
       def method_missing(method_sym, *args, &block)
         if args.length > 0
-          @parameters << CloudSeed::Model::SimpleStackParameter.new(method_sym, args[0])
+          @parameters << Murk::Model::SimpleStackParameter.new(method_sym, args[0])
         else
-          @parameters << CloudSeed::Model::ReferenceStackParameter.new(method_sym, block)
+          @parameters << Murk::Model::ReferenceStackParameter.new(method_sym, block)
         end
       end
 

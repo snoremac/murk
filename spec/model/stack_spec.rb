@@ -16,7 +16,7 @@ RSpec.describe 'Stack' do
     allow(Template).to receive(:new).with('vpc.json').and_return(vpc_template)
     allow(Template).to receive(:new).with('app.json').and_return(app_template)
     allow(Template).to receive(:new).with('database.json').and_return(database_template)
-    CloudSeed.configure(stack_prefix: nil)
+    Murk.configure(stack_prefix: nil)
   end
 
   describe '#qualified_name' do
@@ -27,7 +27,7 @@ RSpec.describe 'Stack' do
     end
 
     context 'when no env has been specified but a global stack prefix is configured' do
-      before(:each) { CloudSeed.configure(stack_prefix: 'goodcorp') }
+      before(:each) { Murk.configure(stack_prefix: 'goodcorp') }
       subject { Stack.new('app').qualified_name }
       it { is_expected.to eql('goodcorp-app') }
     end
@@ -38,7 +38,7 @@ RSpec.describe 'Stack' do
     end
 
     context 'when an env has been specified and a global stack prefix is configured' do
-      before(:each) { CloudSeed.configure(stack_prefix: 'goodcorp') }
+      before(:each) { Murk.configure(stack_prefix: 'goodcorp') }
       subject { Stack.new('app', env: 'prod').qualified_name }
       it { is_expected.to eql('goodcorp-prod-app') }
     end
@@ -138,9 +138,9 @@ RSpec.describe 'Stack' do
       end
 
       it 'should pass the global stack prefix if a \'Prefix\' parameter is declared' do
-        CloudSeed.configure(stack_prefix: 'cloudseed')
+        Murk.configure(stack_prefix: 'murk')
         expect(cloudformation).to receive(:create_stack) do |config|
-          expect(config[:parameters]).to include(parameter_key: :Prefix, parameter_value: 'cloudseed')
+          expect(config[:parameters]).to include(parameter_key: :Prefix, parameter_value: 'murk')
         end
         stack = Stack.new('template')
         stack.create_or_update
@@ -163,10 +163,10 @@ RSpec.describe 'Stack' do
       end
 
       it 'should pass the stack qualified name if a \'QualifiedName\' parameter is declared' do
-        CloudSeed.configure(stack_prefix: 'cloudseed')
+        Murk.configure(stack_prefix: 'murk')
         expect(cloudformation).to receive(:create_stack) do |config|
           expect(config[:parameters]).to include(
-            parameter_key: :QualifiedName, parameter_value: 'cloudseed-uat-template'
+            parameter_key: :QualifiedName, parameter_value: 'murk-uat-template'
           )
         end
         stack = Stack.new('template', env: 'uat')

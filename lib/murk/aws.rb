@@ -1,6 +1,6 @@
 require 'aws-sdk'
 
-module CloudSeed
+module Murk
   module AWS
 
     def cloudformation

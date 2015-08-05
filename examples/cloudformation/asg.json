@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "CloudSeed ASG example",
+  "Description": "Murk ASG example",
   "Parameters": {
     "Prefix": {
       "Type": "String",

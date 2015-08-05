@@ -1,13 +1,13 @@
 
 require 'aws-sdk'
-require 'cloudseed/model/template'
+require 'murk/model/template'
 
-module CloudSeed
+module Murk
   module Model
     class Stack
 
-      include CloudSeed
-      include CloudSeed::AWS
+      include Murk
+      include Murk::AWS
 
       attr_reader :name, :env
       attr_accessor :collection
@@ -53,8 +53,8 @@ module CloudSeed
 
       def qualified_name
         qualified_name = ''
-        if CloudSeed.options[:stack_prefix]
-          qualified_name += CloudSeed.options[:stack_prefix] + '-'
+        if Murk.options[:stack_prefix]
+          qualified_name += Murk.options[:stack_prefix] + '-'
         end
         if @env
           qualified_name += @env + '-'
@@ -104,7 +104,7 @@ module CloudSeed
 
       def implicit_parameters
         implicit_parameters = {}
-        implicit_parameters[:Prefix] = CloudSeed.options[:stack_prefix] if @template.parameter?(:Prefix)
+        implicit_parameters[:Prefix] = Murk.options[:stack_prefix] if @template.parameter?(:Prefix)
         implicit_parameters[:Env] = @env if @template.parameter?(:Env)
         implicit_parameters[:Name] = @name if @template.parameter?(:Name)
         implicit_parameters[:QualifiedName] = qualified_name if @template.parameter?(:QualifiedName)

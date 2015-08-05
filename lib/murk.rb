@@ -1,11 +1,11 @@
 
 require 'logger'
 
-module CloudSeed
+module Murk
 
   DEFAULT_OPTIONS = {
-    template_path: ENV['CLOUDSEED_PATH'] || '',
-    stack_prefix: ENV['CLOUDSEED_PREFIX']
+    template_path: ENV['MURK_PATH'] || '',
+    stack_prefix: ENV['MURK_PREFIX']
   }
 
   def self.configure(options = {})
@@ -19,7 +19,7 @@ module CloudSeed
   def self.load(file)
     self.config_file = file
     config = File.read(config_file)
-    builder = CloudSeed::Builder::CloudSeedBuilder.new
+    builder = Murk::Builder::MurkBuilder.new
     builder.instance_eval(config)
     builder.build
   end
@@ -28,13 +28,13 @@ module CloudSeed
   def self.logger
     @@logger ||= Logger.new(STDOUT).tap do |log|
       log.level = Logger::INFO
-      log.progname = 'CloudSeed'
+      log.progname = 'Murk'
     end
   end
 
   def self.logger=(logger)
     @@logger = logger.tap do |log|
-      log.progname = 'CloudSeed'
+      log.progname = 'Murk'
     end
   end
 
@@ -52,9 +52,9 @@ module CloudSeed
   end
 
   def logger
-    CloudSeed.logger
+    Murk.logger
   end
 
 end
 
-Dir.glob(File.join(File.dirname(__FILE__), 'cloudseed', '**/*.rb')).each { |file| require file }
+Dir.glob(File.join(File.dirname(__FILE__), 'murk', '**/*.rb')).each { |file| require file }

@@ -1,5 +1,5 @@
 
-module CloudSeed
+module Murk
   module Builder
 
     class StackBuilder
@@ -11,7 +11,7 @@ module CloudSeed
       end
 
       def build
-        stack = CloudSeed::Model::Stack.new(@stack_name, env: @env)
+        stack = Murk::Model::Stack.new(@stack_name, env: @env)
         @parameters_builder.build.each do |parameter|
           stack.add_parameter(parameter)
         end

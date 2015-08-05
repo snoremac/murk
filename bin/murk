@@ -6,14 +6,14 @@ require 'logger'
 require 'optparse'
 require 'ostruct'
 
-require 'cloudseed'
+require 'murk'
 
-DEFAULT_CONFIG_FILE = './config/cloudseed.rb'
+DEFAULT_CONFIG_FILE = './config/murk.rb'
 
 def change(options)
   stack_name = ARGV[1]
-  stacks = CloudSeed.load(options.file)
-  stack = stacks.find_by_name(stack_name, env: ENV['CLOUDSEED_ENV'] || ENV['USER'])
+  stacks = Murk.load(options.file)
+  stack = stacks.find_by_name(stack_name, env: ENV['MURK_ENV'] || ENV['USER'])
   if stack
     yield stack
   else
@@ -51,7 +51,7 @@ parser = OptionParser.new do |p|
 
   p.on('-d', '--debug', 'Show extra debugging output') do |debug|
     options.debug = debug
-    CloudSeed.logger.level = Logger::DEBUG
+    Murk.logger.level = Logger::DEBUG
   end
 end
 

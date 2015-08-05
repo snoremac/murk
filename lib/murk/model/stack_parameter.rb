@@ -1,5 +1,5 @@
 
-module CloudSeed
+module Murk
   module Model
 
     class SimpleStackParameter
