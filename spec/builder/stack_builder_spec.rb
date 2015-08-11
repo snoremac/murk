@@ -15,6 +15,13 @@ RSpec.describe 'StackBuilder' do
       StackBuilder.new('vpc', env: 'dev').build
     end
 
+    it 'should set the template filename if supplied' do
+      stack = instance_double('Stack')
+      expect(Stack).to receive(:new).with('app1', env: nil).and_return(stack)
+      expect(stack).to receive(:template_filename=).with('app.json')
+      StackBuilder.new('app1').template('app.json').build
+    end
+
     it 'should set simple stack parameters' do
       stack = instance_double('Stack')
       expect(Stack).to receive(:new).and_return(stack)

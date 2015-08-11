@@ -33,17 +33,20 @@ RSpec.describe 'Murk' do
 
       stack = stacks.find_by_name('vpc', env: ENV['USER'])
       expect(stack.name).to eql('vpc')
+      expect(stack.template.filename).to eql('vpc.json')
       expect(stack.qualified_name).to eql("murk-#{ENV['USER']}-vpc")
       expect(stack.parameter_value(:VPCCIDR)).to eql('10.0.0.0/16')
       expect(stack.parameter_value(:PublicSubnetCIDR)).to eql('10.0.0.0/24')
 
-      stack = stacks.find_by_name('asg', env: ENV['USER'])
-      expect(stack.name).to eql('asg')
-      expect(stack.qualified_name).to eql("murk-#{ENV['USER']}-asg")
+      stack = stacks.find_by_name('web-asg', env: ENV['USER'])
+      expect(stack.name).to eql('web-asg')
+      expect(stack.template.filename).to eql('asg.json')
+      expect(stack.qualified_name).to eql("murk-#{ENV['USER']}-web-asg")
       expect(stack.parameter_value(:SubnetId)).to eql('subnet-123456')
 
       stack = stacks.find_by_name('vpc', env: 'qa')
       expect(stack.name).to eql('vpc')
+      expect(stack.template.filename).to eql('vpc.json')
       expect(stack.qualified_name).to eql('murk-qa-vpc')
       expect(stack.parameter_value(:VPCCIDR)).to eql('10.0.1.0/16')
       expect(stack.parameter_value(:PublicSubnetCIDR)).to eql('10.0.1.0/24')

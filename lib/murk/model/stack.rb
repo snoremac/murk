@@ -9,7 +9,7 @@ module Murk
       include Murk
       include Murk::AWS
 
-      attr_reader :name, :env
+      attr_reader :name, :env, :template
       attr_accessor :collection
 
       def initialize(name, env: nil, template_filename: name + '.json')
@@ -17,6 +17,10 @@ module Murk
         @env = env
         @template = Template.new(template_filename)
         @parameters = []
+      end
+
+      def template_filename=(template_filename)
+        @template = Template.new(template_filename)
       end
 
       def add_parameter(parameter)

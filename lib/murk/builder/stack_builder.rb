@@ -12,10 +12,18 @@ module Murk
 
       def build
         stack = Murk::Model::Stack.new(@stack_name, env: @env)
+        if @template_filename
+          stack.template_filename = @template_filename
+        end
         @parameters_builder.build.each do |parameter|
           stack.add_parameter(parameter)
         end
         stack
+      end
+
+      def template(template_filename)
+        @template_filename = template_filename
+        self
       end
 
       def parameters(&block)

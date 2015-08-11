@@ -22,7 +22,10 @@ env ENV['USER'] do
     end
   end
 
-  stack 'asg' do
+  stack 'web-asg' do
+    # Explicitly set the template filename, useful when creating several different
+    # stacks from the same template
+    template 'asg.json'
     parameters do
       AMIId 'ami-e7ee9edd'
       # Reference parameter configuration
