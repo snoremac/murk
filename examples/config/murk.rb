@@ -30,7 +30,7 @@ env ENV['USER'] do
       AMIId 'ami-e7ee9edd'
       # Reference parameter configuration
       # This will cause Murk to look up the named output of the referenced stack
-      SubnetId { vpc.output(:PublicSubnetId) }
+      SubnetId { stack(:vpc).output(:PublicSubnetId) }
       KeyName ENV['USER']
       ASGMinSize '1'
       ASGMaxSize '1'

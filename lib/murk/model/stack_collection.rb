@@ -24,12 +24,8 @@ module Murk
         end
       end
 
-      def respond_to?(method_sym)
-        @stacks.any? { |stack| stack.name == method_sym.to_s }
-      end
-
-      def method_missing(method_sym)
-        @stacks.find { |stack| stack.name == method_sym.to_s }
+      def stack(name)
+        @stacks.find { |stack| stack.name == name.to_s }
       end
 
     end
