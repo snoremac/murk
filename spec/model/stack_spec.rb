@@ -11,7 +11,7 @@ RSpec.describe 'Stack' do
 
   before(:each) do
     allow(cloudformation).to receive(:list_stacks).and_return(
-      list_stacks_with('uat-vpc': 'CREATE_COMPLETE', 'uat-database': 'UPDATE_FAILED')
+      list_stacks_with('uat-vpc' => 'CREATE_COMPLETE', 'uat-database' => 'UPDATE_FAILED')
     )
     allow(Template).to receive(:new).with('vpc.json').and_return(vpc_template)
     allow(Template).to receive(:new).with('app.json').and_return(app_template)

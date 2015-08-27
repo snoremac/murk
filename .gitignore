@@ -3,3 +3,4 @@ spec.log
 coverage
 spec.log
 log
+Gemfile.lock

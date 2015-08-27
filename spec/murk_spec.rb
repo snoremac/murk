@@ -20,7 +20,7 @@ RSpec.describe 'Murk' do
         .and_return(asg_template_output)
       allow(cloudformation).to receive(:list_stacks).and_return(
         list_stacks_with(
-          "murk-#{ENV['USER']}-vpc": 'CREATE_COMPLETE'
+          "murk-#{ENV['USER']}-vpc" => 'CREATE_COMPLETE'
         )
       )
       allow(cloudformation).to receive(:describe_stacks)
