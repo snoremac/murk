@@ -1,0 +1,79 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Murk network example",
+  "Parameters": {
+    "Prefix": {
+      "Type": "String",
+      "AllowedPattern": "[a-z][a-z0-9\\-]*"
+    },
+    "Env": {
+      "Type": "String",
+      "AllowedPattern": "[a-z][a-z0-9\\-]*"
+    },
+    "Name": {
+      "Type": "String",
+      "AllowedPattern": "[a-z][a-z0-9\\-]*"
+    },
+    "QualifiedName": {
+      "Type": "String",
+      "AllowedPattern": "[a-z][a-z0-9\\-]*"
+    },
+    "VPCId": {
+      "Type" : "String"
+    },
+    "PublicSubnetCIDR": {
+      "Type" : "String"
+    },
+    "InternetGatewayId": {
+      "Type" : "String"
+    }
+  },
+  "Resources": {
+    "PublicSubnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": { "Ref": "VPCId" },
+        "AvailabilityZone": { "Fn::Select" : [ "0", { "Fn::GetAZs" : { "Ref" : "AWS::Region" } } ] },
+        "CidrBlock": { "Ref": "PublicSubnetCIDR" },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : [ "-", [
+              { "Ref": "Prefix" }, { "Ref": "Env" }, { "Ref": "Name" }, "public"
+            ] ] }
+          }
+        ]
+      }
+    },
+    "PublicRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": { "Ref": "VPCId" },
+        "Tags" : [ {
+          "Key" : "Name",
+          "Value": { "Ref": "QualifiedName" }
+        } ]
+      }
+    },
+    "PublicSubnetGatewayRoute": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": { "Ref": "PublicRouteTable" },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": { "Ref": "InternetGatewayId" }
+      }
+    },
+    "PublicSubnetARouteTableAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": { "Ref": "PublicSubnet" },
+        "RouteTableId": { "Ref": "PublicRouteTable" }
+      }
+    }
+  },
+  "Outputs": {
+    "PublicSubnetId": {
+      "Value": { "Ref": "PublicSubnet" }
+    }
+  }
+}

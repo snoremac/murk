@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Murk ASG example",
+  "Description": "Murk compute example",
   "Parameters": {
     "Prefix": {
       "Type": "String",

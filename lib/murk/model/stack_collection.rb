@@ -5,13 +5,12 @@ module Murk
 
       include Enumerable
 
-      def initialize
-        @stacks = []
+      def initialize(stacks = nil)
+        @stacks = stacks || []
       end
 
       def add(stack)
         @stacks << stack
-        stack.collection = self
       end
 
       def each(&block)
@@ -22,10 +21,6 @@ module Murk
         find do |stack|
           stack.name == name && stack.env == env
         end
-      end
-
-      def stack(name)
-        @stacks.find { |stack| stack.name == name.to_s }
       end
 
     end

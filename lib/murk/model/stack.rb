@@ -10,7 +10,6 @@ module Murk
       include Murk::AWS
 
       attr_reader :name, :env, :template
-      attr_accessor :collection
 
       def initialize(name, env: nil, template_filename: name + '.json')
         @name = name
@@ -32,7 +31,7 @@ module Murk
       end
 
       def parameter_value(parameter_key)
-        @parameters.find { |parameter| parameter.key == parameter_key }.resolve(@collection)
+        @parameters.find { |parameter| parameter.key == parameter_key }.resolve
       end
 
       def create_or_update
@@ -117,7 +116,7 @@ module Murk
 
       def explicit_parameters
         @parameters.map do |parameter|
-          { parameter_key: parameter.key, parameter_value: parameter.resolve(@collection) }
+          { parameter_key: parameter.key, parameter_value: parameter.resolve }
         end
       end
 

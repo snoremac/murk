@@ -4,19 +4,20 @@ module Murk
 
     class SimpleStackParameter
 
-      attr_reader :key, :value
+      attr_reader :key, :value, :env
 
-      def initialize(key, value)
+      def initialize(key, value, env: nil)
         @key = key
         @value = value
+        @env = env
       end
 
-      def resolve(stack_collection)
+      def resolve
         @value
       end
 
       def ==(other)
-        @key == other.key && @value == other.value
+        @key == other.key && @value == other.value && @env == other.env
       end
 
     end
@@ -25,13 +26,23 @@ module Murk
 
       attr_reader :key, :block
 
-      def initialize(key, block)
+      def initialize(key, block, env: nil)
         @key = key
         @block = block
+        @env = env
       end
 
-      def resolve(stack_collection)
-        stack_collection.instance_eval(&@block)
+      def resolve
+        instance_eval(&@block)
+      end
+
+      def env(name)
+        @env = name
+        self
+      end
+
+      def stack(name)
+        Stack.new(name, env: @env)
       end
 
     end

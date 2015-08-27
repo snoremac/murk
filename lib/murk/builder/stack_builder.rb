@@ -7,7 +7,7 @@ module Murk
       def initialize(stack_name, env: nil)
         @stack_name = stack_name
         @env = env
-        @parameters_builder = ParametersBuilder.new
+        @parameters_builder = ParametersBuilder.new(env: @env)
       end
 
       def build

@@ -1,63 +1,63 @@
 
 options do
-  # Colon-delimited path specifying where to search for CloudFormation templates
+  # Colon-delimited path specifying where to search for CloudFormation templates.
   # Relative paths are resolved against the directory containing the Murk
-  # configuration file
+  # configuration file.
   template_path '../cloudformation'
+
   # An optional, global prefix prepended to all stack names.
   stack_prefix 'murk'
 end
 
-# Stacks in this environment will be named after the current user
-env ENV['USER'] do
-
+# Stacks in this environment will be named using the string 'shared'.
+env 'shared' do
   # MURK will search for a template named 'vpc.json' in the paths specified
-  # by the template_path option above
+  # by the template_path option above.
   stack 'vpc' do
-    parameters do
-      # Simple parameter configuration
-      # Parameter names should match those declared in the CloudFormation template
-      VPCCIDR '10.0.0.0/16'
-      PublicSubnetCIDR '10.0.0.0/24'
-    end
-  end
 
-  stack 'web-asg' do
-    # Explicitly set the template filename, useful when creating several different
-    # stacks from the same template
-    template 'asg.json'
     parameters do
-      AMIId 'ami-e7ee9edd'
-      # Reference parameter configuration
-      # This will cause Murk to look up the named output of the referenced stack
-      SubnetId { stack(:vpc).output(:PublicSubnetId) }
-      KeyName ENV['USER']
-      ASGMinSize '1'
-      ASGMaxSize '1'
-      ASGDesiredCapacity '1'
+      # Simple parameter configuration.
+      #
+      # Parameter names should match those declared in the CloudFormation template.
+      VPCCIDR '10.0.0.0/16'
     end
+
   end
 
 end
 
-# Stacks in this environment will be named using the string 'qa'
-env 'qa' do
+# Stacks in this environment will be named after the current user.
+env ENV['USER'] do
 
-  stack 'vpc' do
+  stack 'webapp-network' do
+    # Explicitly set the template filename, useful when creating several different
+    # stacks from the same template.
+    template 'network.json'
+
     parameters do
-      VPCCIDR '10.0.1.0/16'
-      PublicSubnetCIDR '10.0.1.0/24'
+      # Reference parameter configuration.
+      #
+      # This will cause Murk to look up the named output of the referenced stack.
+      # Here outputs from a different environment are referenced. This allows
+      # sharing of certain heavyweight resources, such as VPCs or RDS databases.
+      VPCId { env('shared').stack('vpc').output(:VPCId) }
+      InternetGatewayId { env('shared').stack('vpc').output(:InternetGatewayId) }
+
+      PublicSubnetCIDR '10.0.0.0/24'
     end
   end
 
-  stack 'asg' do
+  stack 'webapp-compute' do
+    template 'compute.json'
     parameters do
+      # Reference parameter using an output in the current environment.
+      SubnetId { stack('webapp-network').output(:PublicSubnetId) }
+
       AMIId 'ami-e7ee9edd'
-      SubnetId { vpc.output(:PublicSubnetId) }
-      KeyName 'qa'
-      ASGMinSize '2'
-      ASGMaxSize '4'
-      ASGDesiredCapacity '2'
+      KeyName ENV['USER']
+      ASGMinSize '1'
+      ASGMaxSize '1'
+      ASGDesiredCapacity '1'
     end
   end
 

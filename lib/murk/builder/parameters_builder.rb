@@ -6,7 +6,8 @@ module Murk
 
     class ParametersBuilder
 
-      def initialize
+      def initialize(env: nil)
+        @env = env
         @parameters = []
       end
 
@@ -20,9 +21,9 @@ module Murk
 
       def method_missing(method_sym, *args, &block)
         if args.length > 0
-          @parameters << Murk::Model::SimpleStackParameter.new(method_sym, args[0])
+          @parameters << Murk::Model::SimpleStackParameter.new(method_sym, args[0], env: @env)
         else
-          @parameters << Murk::Model::ReferenceStackParameter.new(method_sym, block)
+          @parameters << Murk::Model::ReferenceStackParameter.new(method_sym, block, env: @env)
         end
       end
 
