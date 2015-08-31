@@ -82,7 +82,7 @@ module Murk
 
       def update
         cloudformation.update_stack(config)
-      rescue Aws::CloudFormation::Errors::ValidationError
+      rescue Aws::CloudFormation::Errors::ValidationError => e
         if e.message =~ /No updates are to be performed/
           return
         else
