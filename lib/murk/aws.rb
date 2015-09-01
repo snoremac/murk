@@ -1,4 +1,5 @@
 require 'aws-sdk'
+require 'aws/extensions/cloudformation'
 
 module Murk
   module AWS

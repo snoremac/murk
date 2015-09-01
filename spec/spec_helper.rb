@@ -67,7 +67,7 @@ RSpec.shared_context 'cloudformation stubs' do
   def describe_stacks_with(stack_outputs)
     Seahorse::Client::Response.new(
       data: Aws::CloudFormation::Types::DescribeStacksOutput.new(stacks: [
-        stack_name: 'vpc',
+        stack_name: 'vpc-uat-foo',
         outputs: stack_outputs.map do |key, value|
           Aws::CloudFormation::Types::Output.new(output_key: key.to_s, output_value: value)
         end

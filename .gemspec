@@ -13,6 +13,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'api_cache', '~> 0.3'
   spec.add_runtime_dependency 'aws-sdk', '~> 2.1'
   spec.add_runtime_dependency 'json', '~> 1.8'
+  spec.add_runtime_dependency 'clamp', '~> 1.0'
 
   spec.add_development_dependency 'pry', '~> 0.10'
   spec.add_development_dependency 'rubocop', '~> 0.32'

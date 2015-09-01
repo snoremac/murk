@@ -16,10 +16,10 @@ module Murk
     @options ||= DEFAULT_OPTIONS
   end
 
-  def self.load(file)
+  def self.load(file, user)
     self.config_file = file
     config = File.read(config_file)
-    builder = Murk::Builder::MurkBuilder.new
+    builder = Murk::Builder::MurkBuilder.new user
     builder.instance_eval(config)
     builder.build
   end

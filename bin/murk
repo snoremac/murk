@@ -3,72 +3,43 @@
 $LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
 
 require 'logger'
-require 'optparse'
-require 'ostruct'
-
+require 'clamp'
 require 'murk'
 
-DEFAULT_CONFIG_FILE = './config/murk.rb'
+Clamp do
 
-def change(options)
-  stack_name = ARGV[1]
-  stacks = Murk.load(options.file)
-  stack = stacks.find_by_name(stack_name, env: ENV['MURK_ENV'] || ENV['USER'])
-  if stack
-    yield stack
-  else
-    fail ArgumentError, 'No stack defined with name ' + stack_name
-  end
-rescue StandardError => e
-  fail_with_exception(e, options.debug)
-end
+  subcommand 'create', 'Create a stack' do
+    option "--stack", "STACK", "Stack name to create", required: true, attribute_name: :stack_name
+    option "--env", "ENV", "Name  of the environment", required: true
+    option "--file", "CONFIG_FILE", "Config file", :default => "./config/murk.rb"
+    option "--wait", :flag, 'Wait for the stack to be created'
+    parameter "USER", "Name your stack"
 
-def fail_with_usage(parser)
-  $stderr.puts parser
-  exit 1
-end
-
-def fail_with_exception(e, debug)
-  cause = e.cause || e
-  $stderr.puts e.message
-  $stderr.puts cause.message
-  if debug
-    $stderr.puts cause.backtrace
-  end
-  exit 2
-end
-
-options = OpenStruct.new
-options.file = DEFAULT_CONFIG_FILE
-options.debug = false
-
-parser = OptionParser.new do |p|
-  p.banner = 'Usage: stack [options] [ create | delete ] STACK'
-
-  p.on('-f', '--file FILE', 'Stack configuration file') do |file|
-    options.file = file
+    def execute
+      stack = Murk.load(file, user).find_by_name(stack_name, env: env)
+      stack.create_or_update
+      if wait?
+        stack.wait(:stack_create_complete) { print "." }
+        puts 'done!'
+      end
+    end
   end
 
-  p.on('-d', '--debug', 'Show extra debugging output') do |debug|
-    options.debug = debug
-    Murk.logger.level = Logger::DEBUG
+  subcommand 'delete', 'Delete a stack' do
+    option "--stack", "STACK", "Stack name to delete", required: true, attribute_name: :stack_name
+    option "--env", "ENV", "Name  of the environment", required: true
+    option "--file", "CONFIG_FILE", "Config file", :default => "./config/murk.rb"
+    option "--wait", :flag, 'Wait for the stack to be deleted'
+    parameter "USER", "Name of your stack"
+
+    def execute
+      stack = Murk.load(file, user).find_by_name(stack_name, env: env)
+      stack.delete
+      if wait?
+        stack.wait(:stack_delete_complete) { print "." }
+        puts 'done!'
+      end
+    end
   end
 end
 
-begin
-  parser.parse!(ARGV)
-rescue OptionParser::ParseError
-  fail_with_usage(parser)
-end
-
-fail_with_usage(parser) unless ARGV.length >= 2
-
-if ARGV[0] == 'create'
-  change(options) { |stack| stack.create_or_update }
-elsif ARGV[0] == 'delete'
-  change(options) { |stack| stack.delete }
-else
-  fail_with_usage(parser)
-end
-
-exit 0

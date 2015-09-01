@@ -24,19 +24,15 @@ A DSL for generating CloudFormation templates themselves.  Murk assumes you've a
     gem install murk
     cd examples
 
-    # Create the stacks in the 'user' environement (named based on the logged in user)
-    murk create vpc
-    murk create asg
+    # Create a VPC stack in the 'qa' environement named 'myqa'
+    murk create --stack vpc --env qa myqa
 
-    # Delete the stacks
-    murk delete asg
-    murk delete vpc
+    # Create the webapp-network stack in the 'qa' environement named 'myqa'
+    murk create --stack webapp-network --env qa myqa
 
-    # Create the stacks in the 'qa' environement
-    export MURK_ENV=qa
-    murk create vpc
-    murk create asg
+    # Create the webapp-compute stack in the 'qa' environement named 'myqa'
+    murk create --stack webapp-compute --env qa myqa
 
-    # Delete the stacks
-    murk delete asg
-    murk delete vpc
+    # Delete the 'qa' webapp-compute stack
+    murk delete --stack webapp-compute --env qa myqa
+
