@@ -9,12 +9,13 @@ module Murk
       include Murk
       include Murk::AWS
 
-      attr_reader :name, :env, :template
+      attr_reader :name, :env, :template, :user
 
-      def initialize(name, env: nil, template_filename: name + '.json')
+      def initialize(name, env:, user:, template_filename: name + '.json')
         @name = name
         @env = env
         @template = Template.new(template_filename)
+        @user = user
         @parameters = []
       end
 
@@ -54,15 +55,16 @@ module Murk
         end
       end
 
+      def wait state
+        cloudformation.wait_forever(:stack_create_complete, stack_name: qualified_name) { yield if block_given? }
+      end
+
       def qualified_name
         qualified_name = ''
         if Murk.options[:stack_prefix]
           qualified_name += Murk.options[:stack_prefix] + '-'
         end
-        if @env
-          qualified_name += @env + '-'
-        end
-        qualified_name + @name
+        qualified_name += "#{@env}-#{@user}-#{@name}"
       end
 
       def output(key)

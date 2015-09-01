@@ -5,10 +5,8 @@ RSpec.describe 'StackCollection' do
 
     let(:stacks) do
       [
-        Stack.new('stack1'),
-        Stack.new('stack1', env: 'uat'),
-        Stack.new('stack2', env: 'uat'),
-        Stack.new('stack1', env: 'uat')
+        Stack.new('stack1', env: 'uat', user: 'tester'),
+        Stack.new('stack2', env: 'uat', user: 'tester')
       ]
     end
     let(:stack_collection) { StackCollection.new }
@@ -18,11 +16,8 @@ RSpec.describe 'StackCollection' do
     end
 
     it 'should return the first matching stack' do
-      expect(stack_collection.find_by_name('stack1', env: 'uat')).to be(stacks[1])
+      expect(stack_collection.find_by_name('stack1', env: 'uat')).to be(stacks[0])
     end
 
-    it 'should find stacks with no env if none is supplied' do
-      expect(stack_collection.find_by_name('stack1')).to be(stacks[0])
-    end
   end
 end

@@ -25,7 +25,7 @@ RSpec.describe 'MurkBuilder' do
       end
 
       it 'should configure global options' do
-        builder = MurkBuilder.new
+        builder = MurkBuilder.new 'tester'
         builder.options(&options).build
         expect(Murk.options[:template_path]).to eql('/tmp')
         expect(Murk.options[:stack_prefix]).to eql('murk')
@@ -40,7 +40,7 @@ RSpec.describe 'MurkBuilder' do
           expect(stack.name).to eql('vpc')
         end
 
-        builder = MurkBuilder.new
+        builder = MurkBuilder.new 'tester'
         builder.stack('vpc', &proc {}).build
       end
     end
@@ -55,7 +55,7 @@ RSpec.describe 'MurkBuilder' do
           expect(stack.name).to eql('app')
         end
 
-        builder = MurkBuilder.new
+        builder = MurkBuilder.new 'tester'
         builder.env('qa', &qa_env).build
       end
     end

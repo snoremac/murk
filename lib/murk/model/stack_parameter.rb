@@ -26,9 +26,10 @@ module Murk
 
       attr_reader :key, :block
 
-      def initialize(key, block, env: nil)
+      def initialize(key, block, env: nil, user: nil)
         @key = key
         @block = block
+        @user = user
         @env = env
       end
 
@@ -36,13 +37,8 @@ module Murk
         instance_eval(&@block)
       end
 
-      def env(name)
-        @env = name
-        self
-      end
-
       def stack(name)
-        Stack.new(name, env: @env)
+        Stack.new(name, env: @env, user: @user)
       end
 
     end

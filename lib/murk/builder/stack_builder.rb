@@ -4,14 +4,16 @@ module Murk
 
     class StackBuilder
 
-      def initialize(stack_name, env: nil)
+      def initialize(stack_name, user:, env:)
         @stack_name = stack_name
         @env = env
-        @parameters_builder = ParametersBuilder.new(env: @env)
+        @user = user
+        @parameters_builder = ParametersBuilder.new(env: @env, user: user)
       end
 
       def build
-        stack = Murk::Model::Stack.new(@stack_name, env: @env)
+        stack = Murk::Model::Stack.new(@stack_name, env: @env, user: @user)
+
         if @template_filename
           stack.template_filename = @template_filename
         end
