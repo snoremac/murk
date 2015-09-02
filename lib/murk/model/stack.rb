@@ -112,6 +112,7 @@ module Murk
         implicit_parameters[:Prefix] = Murk.options[:stack_prefix] if @template.parameter?(:Prefix)
         implicit_parameters[:Env] = @env if @template.parameter?(:Env)
         implicit_parameters[:Name] = @name if @template.parameter?(:Name)
+        implicit_parameters[:User] = @user if @template.parameter?(:User)
         implicit_parameters[:QualifiedName] = qualified_name if @template.parameter?(:QualifiedName)
         implicit_parameters.map { |key, value| { parameter_key: key, parameter_value: value } }
       end
