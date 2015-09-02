@@ -10,6 +10,12 @@ Style/Documentation:
 Style/IfUnlessModifier:
   Enabled: false
 Lint/UnusedMethodArgument:
-  Enabled: false  
+  Enabled: false
 Metrics/LineLength:
   Max: 120
+StringLiterals:
+  Enabled: false
+Style/MethodDefParentheses:
+  Enabled: false
+Style/GuardClause:
+  Enabled: false

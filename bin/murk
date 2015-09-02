@@ -11,7 +11,7 @@ Clamp do
   subcommand 'create', 'Create a stack' do
     option "--stack", "STACK", "Stack name to create", required: true, attribute_name: :stack_name
     option "--env", "ENV", "Name  of the environment", required: true
-    option "--file", "CONFIG_FILE", "Config file", :default => "./config/murk.rb"
+    option "--file", "CONFIG_FILE", "Config file", default: "./config/murk.rb"
     option "--wait", :flag, 'Wait for the stack to be created'
     parameter "USER", "Name your stack"
 
@@ -28,7 +28,7 @@ Clamp do
   subcommand 'delete', 'Delete a stack' do
     option "--stack", "STACK", "Stack name to delete", required: true, attribute_name: :stack_name
     option "--env", "ENV", "Name  of the environment", required: true
-    option "--file", "CONFIG_FILE", "Config file", :default => "./config/murk.rb"
+    option "--file", "CONFIG_FILE", "Config file", default: "./config/murk.rb"
     option "--wait", :flag, 'Wait for the stack to be deleted'
     parameter "USER", "Name of your stack"
 
@@ -42,4 +42,3 @@ Clamp do
     end
   end
 end
-

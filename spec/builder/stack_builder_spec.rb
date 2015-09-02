@@ -20,8 +20,10 @@ RSpec.describe 'StackBuilder' do
     it 'should set simple stack parameters' do
       stack = instance_double('Stack')
       expect(Stack).to receive(:new).and_return(stack)
-      expect(stack).to receive(:add_parameter).with(SimpleStackParameter.new(:VPCCIDR, '10.0.0.0/16', env: 'dev'))
-      expect(stack).to receive(:add_parameter).with(SimpleStackParameter.new(:PublicSubnetACIDR, '10.0.0.0/24', env: 'dev'))
+      expect(stack).to receive(:add_parameter)
+        .with(SimpleStackParameter.new(:VPCCIDR, '10.0.0.0/16', env: 'dev'))
+      expect(stack).to receive(:add_parameter)
+        .with(SimpleStackParameter.new(:PublicSubnetACIDR, '10.0.0.0/24', env: 'dev'))
       params = proc do
         VPCCIDR '10.0.0.0/16'
         PublicSubnetACIDR '10.0.0.0/24'
