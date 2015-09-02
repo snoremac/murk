@@ -2,7 +2,7 @@ module Aws
   module CloudFormation
     class Client
 
-      def wait_forever state, stack_name
+      def wait_forever(state, stack_name)
         wait_until(state, stack_name) do |w|
           # disable max attempts
           w.max_attempts = nil
@@ -14,4 +14,3 @@ module Aws
     end
   end
 end
-

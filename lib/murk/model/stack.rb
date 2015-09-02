@@ -64,7 +64,7 @@ module Murk
         if Murk.options[:stack_prefix]
           qualified_name += Murk.options[:stack_prefix] + '-'
         end
-        qualified_name += "#{@env}-#{@user}-#{@name}"
+        qualified_name + "#{@env}-#{@user}-#{@name}"
       end
 
       def output(key)
