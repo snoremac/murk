@@ -21,7 +21,7 @@ module Murk
     config = File.read(config_file)
     builder = Murk::Builder::MurkBuilder.new user
     builder.instance_eval(config)
-    builder.build
+    builder
   end
 
   # rubocop:disable Style/ClassVars
