@@ -10,6 +10,7 @@ module Aws
             yield attempts, response if block_given?
           end
         end
+      rescue Aws::Waiters::Errors::UnexpectedError
       end
     end
   end
