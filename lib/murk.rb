@@ -54,7 +54,15 @@ module Murk
   def logger
     Murk.logger
   end
-
 end
 
-Dir.glob(File.join(File.dirname(__FILE__), 'murk', '**/*.rb')).each { |file| require file }
+require 'murk/aws'
+require 'murk/model/stack'
+require 'murk/model/stack_collection'
+require 'murk/model/stack_parameter'
+require 'murk/model/template'
+require 'murk/builder/murk_builder'
+require 'murk/builder/options_builder'
+require 'murk/builder/parameters_builder'
+require 'murk/builder/stack_builder'
+
