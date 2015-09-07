@@ -65,4 +65,3 @@ require 'murk/builder/murk_builder'
 require 'murk/builder/options_builder'
 require 'murk/builder/parameters_builder'
 require 'murk/builder/stack_builder'
-

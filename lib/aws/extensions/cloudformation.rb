@@ -11,6 +11,7 @@ module Aws
           end
         end
       rescue Aws::Waiters::Errors::UnexpectedError
+        nil
       end
     end
   end

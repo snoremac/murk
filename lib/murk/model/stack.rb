@@ -56,7 +56,7 @@ module Murk
       end
 
       def wait state
-        cloudformation.wait_forever(:stack_create_complete, stack_name: qualified_name) { yield if block_given? }
+        cloudformation.wait_forever(state, stack_name: qualified_name) { yield if block_given? }
       end
 
       def qualified_name
@@ -86,7 +86,7 @@ module Murk
         cloudformation.update_stack(config)
       rescue Aws::CloudFormation::Errors::ValidationError => e
         if e.message =~ /No updates are to be performed/
-          return
+          return false
         else
           raise StackError, "Failed to update stack #{@name}"
         end
