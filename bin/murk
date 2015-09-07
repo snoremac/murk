@@ -8,11 +8,22 @@ require 'murk'
 
 Clamp do
 
+  def fail_with_exception(e)
+    cause = e.cause || e
+    $stderr.puts e.message
+    $stderr.puts cause.message
+    if debug?
+      $stderr.puts cause.backtrace
+    end
+    exit 2
+  end
+
   subcommand 'create', 'Create a stack' do
     option "--stack", "STACK", "Stack name to create", required: true, attribute_name: :stack_name
     option "--env", "ENV", "Name  of the environment", required: true
     option "--file", "CONFIG_FILE", "Config file", default: "./config/murk.rb"
     option "--wait", :flag, 'Wait for the stack to be created'
+    option "--debug", :flag, 'Show backtrace on error'
     parameter "USER", "Name your stack"
 
     def execute
@@ -22,6 +33,8 @@ Clamp do
         stack.wait(:stack_create_complete) { print "." }
         puts 'done!'
       end
+    rescue StandardError => e
+      fail_with_exception(e)
     end
   end
 
@@ -30,6 +43,7 @@ Clamp do
     option "--env", "ENV", "Name  of the environment", required: true
     option "--file", "CONFIG_FILE", "Config file", default: "./config/murk.rb"
     option "--wait", :flag, 'Wait for the stack to be deleted'
+    option "--debug", :flag, 'Show backtrace on error'
     parameter "USER", "Name of your stack"
 
     def execute
@@ -39,6 +53,8 @@ Clamp do
         stack.wait(:stack_delete_complete) { print "." }
         puts 'done!'
       end
+    rescue StandardError => e
+      fail_with_exception(e)
     end
   end
 end
