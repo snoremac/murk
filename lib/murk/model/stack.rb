@@ -11,12 +11,48 @@ module Murk
 
       attr_reader :name, :env, :template, :user
 
-      def initialize(name, env:, user:, template_filename: name + '.json')
+      def initialize(qname: nil, name: nil, env: nil, user: nil, template_filename: nil)
+        check_init_params(qname, name, env, user)
+        if qname
+          initialize_from_qname(qname)
+        else
+          initialize_from_qname_parts(name, env, user)
+        end
+
+        initialize_template(template_filename)
+        @parameters = []
+      end
+
+      def check_init_params(qname, name, env, user)
+        message = "Either specify ( qname: ) or ( name:, env:, user: ) when creating a Stack"
+        if qname
+          fail ArgumentError, message unless [name, env, user].all?(&:nil?)
+        else
+          fail ArgumentError, message if [name, env, user].any?(&:nil?)
+        end
+      end
+
+      def initialize_from_qname(qname)
+        qname_parts = qname.split('-')
+        if qname_parts[0] == Murk.options[:stack_prefix]
+          qname_parts.shift
+        end
+        @env = qname_parts[0]
+        @user = qname_parts[1]
+        @name = qname_parts[2..-1].join('-')
+      end
+
+      def initialize_from_qname_parts(name, env, user)
         @name = name
         @env = env
-        @template = Template.new(template_filename)
         @user = user
-        @parameters = []
+      end
+
+      def initialize_template(template_filename)
+        unless template_filename
+          template_filename = @name + '.json'
+        end
+        @template = Template.new(template_filename)
       end
 
       def template_filename=(template_filename)

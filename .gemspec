@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name        = 'murk'
-  spec.version     = '0.3.2'
+  spec.version     = '0.4.0'
   spec.summary     = 'Murk'
   spec.description = 'Murk - Parameterization and environmental partitioning for AWS CloudFormation'
   spec.authors     = ['Cam Smith']

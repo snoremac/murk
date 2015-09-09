@@ -28,7 +28,7 @@ env 'qa' do
     template 'compute.json'
     parameters do
       # Reference parameter using an output in the current environment.
-      SubnetId { stack('webapp-network').output(:PublicSubnetId) }
+      SubnetId { stack(name: 'webapp-network').output(:PublicSubnetId) }
 
       AMIId 'ami-e7ee9edd'
       KeyName ENV['USER']
@@ -44,8 +44,10 @@ env 'qa' do
     template 'network.json'
 
     parameters do
-      VPCId { stack('vpc').output(:VPCId) }
-      InternetGatewayId { stack('vpc').output(:InternetGatewayId) }
+      # Reference parameters can also use the stack's fully qualified name, for
+      # stacks declared in different environments or by different users
+      VPCId { stack(qname: 'murk-qa-tester-vpc').output(:VPCId) }
+      InternetGatewayId { stack(qname: 'murk-qa-tester-vpc').output(:InternetGatewayId) }
 
       PublicSubnetCIDR '10.0.0.0/24'
     end
