@@ -129,8 +129,10 @@ module Murk
       end
 
       def existing
-        cloudformation.list_stacks.stack_summaries.select do |stack|
-          stack.stack_name == qualified_name && stack.stack_status != 'DELETE_COMPLETE'
+        cloudformation.list_stacks(
+          stack_status_filter: %w(CREATE_COMPLETE UPDATE_ROLLBACK_COMPLETE UPDATE_COMPLETE))
+          .stack_summaries.select do |stack|
+          stack.stack_name == qualified_name
         end
       end
 
