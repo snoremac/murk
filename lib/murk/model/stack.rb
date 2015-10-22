@@ -1,4 +1,5 @@
 
+require 'api_cache'
 require 'aws-sdk'
 require 'murk/model/template'
 
@@ -104,10 +105,12 @@ module Murk
       end
 
       def output(key)
-        return unless exists?
-        outputs = cloudformation.describe_stacks(stack_name: qualified_name)[:stacks][0][:outputs]
-        output = outputs.find { |o| o.output_key == key.to_s }
-        output ? output.output_value : nil
+        APICache.get("output_#{@qualified_name}_#{key}", { cache: 10, valid: 30, period: 30 }) do
+          return unless exists?
+          outputs = cloudformation.describe_stacks(stack_name: qualified_name)[:stacks][0][:outputs]
+          output = outputs.find { |o| o.output_key == key.to_s }
+          output ? output.output_value : nil
+        end
       end
 
       private
@@ -129,10 +132,12 @@ module Murk
       end
 
       def existing
-        cloudformation.list_stacks(
-          stack_status_filter: %w(CREATE_COMPLETE UPDATE_ROLLBACK_COMPLETE UPDATE_COMPLETE))
-          .stack_summaries.select do |stack|
-          stack.stack_name == qualified_name
+        APICache.get('list_stacks', { cache: 10, valid: 30, period: 30 }) do
+          cloudformation.list_stacks(
+            stack_status_filter: %w(CREATE_COMPLETE UPDATE_ROLLBACK_COMPLETE UPDATE_COMPLETE))
+            .stack_summaries.select do |stack|
+            stack.stack_name == qualified_name
+          end
         end
       end
 
@@ -156,6 +161,7 @@ module Murk
       end
 
       def explicit_parameters
+
         @parameters.map do |parameter|
           { parameter_key: parameter.key, parameter_value: parameter.resolve }
         end
