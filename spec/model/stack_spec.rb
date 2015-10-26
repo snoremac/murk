@@ -10,9 +10,14 @@ RSpec.describe 'Stack' do
   let(:database_template) { instance_double('Template', filename: 'database.json', body: 'database_template_body') }
 
   before(:each) do
-    allow(cloudformation).to receive(:list_stacks).and_return(
-      list_stacks_with('uat-tester-vpc' => 'CREATE_COMPLETE', 'uat-tester-database' => 'UPDATE_FAILED')
-    )
+    allow(cloudformation).to receive(:describe_stacks)
+      .and_return(data: Aws::CloudFormation::Types::DescribeStacksOutput.new(stacks: []))
+    allow(cloudformation).to receive(:describe_stacks)
+      .with(stack_name: 'uat-tester-vpc')
+      .and_return(describe_stacks_with(stack_name: 'uat-tester-vpc', stack_status: 'CREATE_COMPLETE', outputs: {}))
+    allow(cloudformation).to receive(:describe_stacks)
+      .with(stack_name: 'uat-tester-database')
+      .and_return(describe_stacks_with(stack_name: 'uat-tester-database', stack_status: 'UPDATE_FAILED', outputs: {}))
     allow(Template).to receive(:new).with('vpc.json').and_return(vpc_template)
     allow(Template).to receive(:new).with('app.json').and_return(app_template)
     allow(Template).to receive(:new).with('database.json').and_return(database_template)
@@ -90,7 +95,7 @@ RSpec.describe 'Stack' do
       allow(Template).to receive(:new).with('explicit.json').and_return(explicit_template)
 
       expect(cloudformation).to receive(:create_stack).with hash_including(template_body: 'explicit_template_body')
-      Stack.new(name: 'app', env: 'test', user: 'foo', template_filename: 'explicit.json').create_or_update
+      Stack.new(name: 'vpc', env: 'uat', user: 'foo', template_filename: 'explicit.json').create_or_update
     end
 
     it 'should update the stack where one exists with the same qualified name' do
@@ -193,7 +198,12 @@ RSpec.describe 'Stack' do
     let(:outputs) { { VPCCId: 'vpc-72895717', PublicSubnetId: 'subnet-0f3a896a' } }
 
     before(:each) do
-      allow(cloudformation).to receive(:describe_stacks).and_return(describe_stacks_with(outputs))
+      allow(cloudformation).to receive(:describe_stacks)
+        .and_return(describe_stacks_with(
+          stack_name: 'murk-uat-tester-vpc',
+          stack_status: 'CREATE_COMPLETE',
+          outputs: outputs
+        ))
     end
 
     it "should provide a stack's outputs by name" do

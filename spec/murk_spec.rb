@@ -11,8 +11,6 @@ RSpec.describe 'Murk' do
     let(:vpc_template_output) { validate_template_with(vpc_parameter_keys) }
     let(:network_template_output) { validate_template_with(network_parameter_keys) }
     let(:compute_template_output) { validate_template_with(compute_parameter_keys) }
-    let(:shared_vpc_describe_output) { describe_stacks_with(VPCId: 'vpc-123456', InternetGatewayId: 'igw-123456') }
-    let(:user_network_describe_output) { describe_stacks_with(PublicSubnetId: 'subnet-123456') }
 
     before(:each) do
       allow(cloudformation).to receive(:validate_template)
@@ -24,18 +22,20 @@ RSpec.describe 'Murk' do
       allow(cloudformation).to receive(:validate_template)
         .with(hash_including(template_body: a_string_matching(/compute example/)))
         .and_return(compute_template_output)
-      allow(cloudformation).to receive(:list_stacks).and_return(
-        list_stacks_with(
-          'murk-qa-tester-vpc' => 'CREATE_COMPLETE',
-          "murk-qa-tester-webapp-network" => 'CREATE_COMPLETE'
-        )
-      )
       allow(cloudformation).to receive(:describe_stacks)
         .with(stack_name: 'murk-qa-tester-vpc')
-        .and_return(shared_vpc_describe_output)
+        .and_return(describe_stacks_with(
+          stack_name: 'murk-qa-tester-vpc',
+          stack_status: 'CREATE_COMPLETE',
+          outputs: { VPCId: 'vpc-123456', InternetGatewayId: 'igw-123456' }
+        ))
       allow(cloudformation).to receive(:describe_stacks)
-        .with(stack_name: "murk-qa-tester-webapp-network")
-        .and_return(user_network_describe_output)
+        .with(stack_name: 'murk-qa-tester-webapp-network')
+        .and_return(describe_stacks_with(
+          stack_name: 'murk-qa-tester-webapp-network',
+          stack_status: 'CREATE_COMPLETE',
+          outputs: { PublicSubnetId: 'subnet-123456' }
+        ))
     end
 
     it 'should create and configure stacks' do

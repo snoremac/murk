@@ -57,21 +57,12 @@ RSpec.shared_context 'cloudformation stubs' do
     )
   end
 
-  def list_stacks_with(stack_statuses)
-    Seahorse::Client::Response.new(
-      data: Aws::CloudFormation::Types::ListStacksOutput.new(
-        stack_summaries: stack_statuses.map do |key, value|
-          Aws::CloudFormation::Types::StackSummary.new(stack_name: key.to_s, stack_status: value)
-        end
-      )
-    )
-  end
-
-  def describe_stacks_with(stack_outputs)
+  def describe_stacks_with(describe_output)
     Seahorse::Client::Response.new(
       data: Aws::CloudFormation::Types::DescribeStacksOutput.new(stacks: [
-        stack_name: 'vpc-uat-foo',
-        outputs: stack_outputs.map do |key, value|
+        stack_name: describe_output[:stack_name],
+        stack_status: describe_output[:stack_status],
+        outputs: describe_output[:outputs].map do |key, value|
           Aws::CloudFormation::Types::Output.new(output_key: key.to_s, output_value: value)
         end
       ])

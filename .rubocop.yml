@@ -5,6 +5,8 @@ Style/EmptyLinesAroundClassBody:
   Enabled: false
 Style/EmptyLinesAroundModuleBody:
   Enabled: false
+Style/FirstParameterIndentation:
+  Enabled: false
 Style/Documentation:
   Enabled: false
 Style/IfUnlessModifier:
