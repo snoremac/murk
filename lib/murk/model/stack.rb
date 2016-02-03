@@ -131,6 +131,7 @@ module Murk
       end
 
       def existing
+        sleep 0.2
         cloudformation.list_stacks(
           stack_status_filter: %w(CREATE_COMPLETE UPDATE_ROLLBACK_COMPLETE UPDATE_COMPLETE))
           .stack_summaries.select do |stack|
