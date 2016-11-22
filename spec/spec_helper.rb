@@ -1,5 +1,4 @@
 
-require 'api_cache'
 require 'simplecov'
 SimpleCov.start
 require 'pry'
@@ -16,8 +15,6 @@ ReferenceStackParameter = Murk::Model::ReferenceStackParameter
 Template = Murk::Model::Template
 TemplateError = Murk::Model::TemplateError
 StackError = Murk::Model::StackError
-
-APICache.store = APICache::NullStore.new
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
