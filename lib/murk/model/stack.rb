@@ -105,12 +105,12 @@ module Murk
       end
 
       def output(key)
-        return unless exists?
-        stack = APICache.get("stack_#{@qualified_name}", { cache: 10, valid: 30, period: 30 }) do
-          cloudformation.describe_stacks(stack_name: qualified_name)[:stacks][0]
+        APICache.get("output_#{@qualified_name}_#{key}", { cache: 10, valid: 30, period: 30 }) do
+          return unless exists?
+          outputs = cloudformation.describe_stacks(stack_name: qualified_name)[:stacks][0][:outputs]
+          output = outputs.find { |o| o.output_key == key.to_s }
+          output ? output.output_value : nil
         end
-        output = stack[:outputs].find { |o| o.output_key == key.to_s }
-        output ? output.output_value : nil
       end
 
       private
@@ -132,12 +132,13 @@ module Murk
       end
 
       def existing
-        stacks = APICache.get('list_stacks', { cache: 10, valid: 30, period: 30 }) do
+        APICache.get('list_stacks', { cache: 10, valid: 30, period: 30 }) do
           cloudformation.list_stacks(
-            stack_status_filter: %w(CREATE_COMPLETE UPDATE_ROLLBACK_COMPLETE UPDATE_COMPLETE)
-          )
+            stack_status_filter: %w(CREATE_COMPLETE UPDATE_ROLLBACK_COMPLETE UPDATE_COMPLETE))
+            .stack_summaries.select do |stack|
+            stack.stack_name == qualified_name
+          end
         end
-        stacks.stack_summaries.select { |stack| stack.stack_name == qualified_name }
       end
 
       def config
@@ -160,6 +161,7 @@ module Murk
       end
 
       def explicit_parameters
+
         @parameters.map do |parameter|
           { parameter_key: parameter.key, parameter_value: parameter.resolve }
         end
