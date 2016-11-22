@@ -48,6 +48,7 @@ module Murk
         if @validated.has_key?(@filename)
           @validate_output = @validated[@filename]
         else
+          sleep 0.2
           @validate_output ||= cloudformation.validate_template(template_body: body)
           @validated[@filename] = @validate_output
         end
