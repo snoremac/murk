@@ -83,11 +83,11 @@ module Murk
       end
 
       def exists?
-        describe.any?
+        existing.any?
       end
 
       def failed?
-        describe.any? do |stack|
+        existing.any? do |stack|
           stack.stack_status =~ /FAILED/
         end
       end
@@ -106,7 +106,10 @@ module Murk
 
       def output(key)
         return unless exists?
-        output = describe[0][:outputs].find { |o| o.output_key == key.to_s }
+        stack = APICache.get("stack_#{@qualified_name}", { cache: 10, valid: 30, period: 30 }) do
+          cloudformation.describe_stacks(stack_name: qualified_name)[:stacks][0]
+        end
+        output = stack[:outputs].find { |o| o.output_key == key.to_s }
         output ? output.output_value : nil
       end
 
@@ -128,10 +131,13 @@ module Murk
         end
       end
 
-      def describe
-        APICache.get("stack_#{qualified_name}", { cache: 10, valid: 30, period: 30 }) do
-          cloudformation.describe_stacks(stack_name: qualified_name)[:stacks]
+      def existing
+        stacks = APICache.get('list_stacks', { cache: 10, valid: 30, period: 30 }) do
+          cloudformation.list_stacks(
+            stack_status_filter: %w(CREATE_COMPLETE UPDATE_ROLLBACK_COMPLETE UPDATE_COMPLETE)
+          )
         end
+        stacks.stack_summaries.select { |stack| stack.stack_name == qualified_name }
       end
 
       def config
