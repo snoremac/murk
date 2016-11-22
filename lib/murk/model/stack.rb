@@ -113,12 +113,14 @@ module Murk
       private
 
       def create
+        sleep 0.2
         cloudformation.create_stack(config)
       rescue Aws::CloudFormation::Errors::ValidationError
         raise StackError, "Failed to create stack #{@name}"
       end
 
       def update
+        sleep 0.2
         cloudformation.update_stack(config)
       rescue Aws::CloudFormation::Errors::ValidationError => e
         if e.message =~ /No updates are to be performed/
@@ -129,6 +131,7 @@ module Murk
       end
 
       def existing
+        sleep 0.2
         cloudformation.list_stacks(
           stack_status_filter: %w(CREATE_COMPLETE UPDATE_ROLLBACK_COMPLETE UPDATE_COMPLETE))
           .stack_summaries.select do |stack|
