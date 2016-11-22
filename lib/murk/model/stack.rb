@@ -88,7 +88,7 @@ module Murk
 
       def failed?
         describe.any? do |stack|
-          stack[:stack_status] =~ /FAILED/
+          stack.stack_status =~ /FAILED/
         end
       end
 
@@ -129,10 +129,9 @@ module Murk
       end
 
       def describe
-        stacks = APICache.get("stack_#{qualified_name}", cache: 10, valid: 30, period: 30) do
+        APICache.get("stack_#{qualified_name}", { cache: 10, valid: 30, period: 30 }) do
           cloudformation.describe_stacks(stack_name: qualified_name)[:stacks]
         end
-        stacks || []
       end
 
       def config
