@@ -121,7 +121,6 @@ module Murk
 
       def update
         sleep 0.5
-        $stdout.puts(config)
         cloudformation.update_stack(config)
       rescue Aws::CloudFormation::Errors::ValidationError => e
         if e.message =~ /No updates are to be performed/
