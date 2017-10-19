@@ -11,12 +11,48 @@ module Murk
 
       attr_reader :name, :env, :template, :user
 
-      def initialize(name, env:, user:, template_filename: name + '.json')
+      def initialize(qname: nil, name: nil, env: nil, user: nil, template_filename: nil)
+        check_init_params(qname, name, env, user)
+        if qname
+          initialize_from_qname(qname)
+        else
+          initialize_from_qname_parts(name, env, user)
+        end
+
+        initialize_template(template_filename)
+        @parameters = []
+      end
+
+      def check_init_params(qname, name, env, user)
+        message = "Either specify ( qname: ) or ( name:, env:, user: ) when creating a Stack"
+        if qname
+          fail ArgumentError, message unless [name, env, user].all?(&:nil?)
+        else
+          fail ArgumentError, message if [name, env, user].any?(&:nil?)
+        end
+      end
+
+      def initialize_from_qname(qname)
+        qname_parts = qname.split('-')
+        if qname_parts[0] == Murk.options[:stack_prefix]
+          qname_parts.shift
+        end
+        @env = qname_parts[0]
+        @user = qname_parts[1]
+        @name = qname_parts[2..-1].join('-')
+      end
+
+      def initialize_from_qname_parts(name, env, user)
         @name = name
         @env = env
-        @template = Template.new(template_filename)
         @user = user
-        @parameters = []
+      end
+
+      def initialize_template(template_filename)
+        unless template_filename
+          template_filename = @name + '.json'
+        end
+        @template = Template.new(template_filename)
       end
 
       def template_filename=(template_filename)
@@ -56,7 +92,7 @@ module Murk
       end
 
       def wait state
-        cloudformation.wait_forever(:stack_create_complete, stack_name: qualified_name) { yield if block_given? }
+        cloudformation.wait_forever(state, stack_name: qualified_name) { yield if block_given? }
       end
 
       def qualified_name
@@ -77,25 +113,37 @@ module Murk
       private
 
       def create
+        sleep 0.5
         cloudformation.create_stack(config)
       rescue Aws::CloudFormation::Errors::ValidationError
         raise StackError, "Failed to create stack #{@name}"
       end
 
       def update
+        sleep 0.5
         cloudformation.update_stack(config)
       rescue Aws::CloudFormation::Errors::ValidationError => e
         if e.message =~ /No updates are to be performed/
-          return
+          return false
         else
           raise StackError, "Failed to update stack #{@name}"
         end
       end
 
       def existing
-        cloudformation.list_stacks.stack_summaries.select do |stack|
-          stack.stack_name == qualified_name && stack.stack_status != 'DELETE_COMPLETE'
+        stack = []
+        response = cloudformation.list_stacks(
+          stack_status_filter: %w(CREATE_COMPLETE UPDATE_ROLLBACK_COMPLETE UPDATE_COMPLETE))
+        loop do
+          stack = response.stack_summaries.select do |stack|
+            stack.stack_name == qualified_name
+          end
+          break if response.last_page? || stack.any?
+          sleep 0.4
+          response = response.next_page
         end
+
+        stack
       end
 
       def config
@@ -112,6 +160,7 @@ module Murk
         implicit_parameters[:Prefix] = Murk.options[:stack_prefix] if @template.parameter?(:Prefix)
         implicit_parameters[:Env] = @env if @template.parameter?(:Env)
         implicit_parameters[:Name] = @name if @template.parameter?(:Name)
+        implicit_parameters[:User] = @user if @template.parameter?(:User)
         implicit_parameters[:QualifiedName] = qualified_name if @template.parameter?(:QualifiedName)
         implicit_parameters.map { |key, value| { parameter_key: key, parameter_value: value } }
       end

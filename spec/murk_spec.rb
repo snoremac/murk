@@ -39,7 +39,7 @@ RSpec.describe 'Murk' do
     end
 
     it 'should create and configure stacks' do
-      stacks = Murk.load(File.dirname(__FILE__) + '/../examples/config/murk.rb', 'tester')
+      stacks = Murk.load(File.dirname(__FILE__) + '/../examples/config/murk.rb', 'tester').stacks
 
       stack = stacks.find_by_name('vpc', env: 'qa')
       expect(stack.name).to eql('vpc')

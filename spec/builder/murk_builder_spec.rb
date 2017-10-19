@@ -33,18 +33,6 @@ RSpec.describe 'MurkBuilder' do
 
     end
 
-    context 'when building bare stacks' do
-
-      it 'should create the stack with the correct name' do
-        expect(stack_collection).to receive(:add) do |stack|
-          expect(stack.name).to eql('vpc')
-        end
-
-        builder = MurkBuilder.new 'tester'
-        builder.stack('vpc', &proc {}).build
-      end
-    end
-
     context 'when building stacks within an env' do
 
       it 'should create stacks with the correct names' do

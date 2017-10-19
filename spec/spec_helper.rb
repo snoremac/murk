@@ -54,6 +54,33 @@ RSpec.shared_context 'cloudformation stubs' do
     )
   end
 
+  module StubPageableResponse
+    @last_page = true
+
+    attr_accessor :last_page
+    attr_accessor :next_page
+
+    def last_page?
+      if @last_page.nil? || @last_page
+        true
+      else
+        false
+      end
+    end
+
+    def next_page
+      @next_page
+    end
+  end
+
+  def list_stacks_with_paging(stack_statuses, stack_statuses_page_2)
+    stacks = list_stacks_with(stack_statuses)
+    second_page = list_stacks_with(stack_statuses_page_2)
+    stacks.last_page = false
+    stacks.next_page = second_page
+    stacks
+  end
+
   def list_stacks_with(stack_statuses)
     Seahorse::Client::Response.new(
       data: Aws::CloudFormation::Types::ListStacksOutput.new(
@@ -61,7 +88,7 @@ RSpec.shared_context 'cloudformation stubs' do
           Aws::CloudFormation::Types::StackSummary.new(stack_name: key.to_s, stack_status: value)
         end
       )
-    )
+    ).extend(StubPageableResponse)
   end
 
   def describe_stacks_with(stack_outputs)

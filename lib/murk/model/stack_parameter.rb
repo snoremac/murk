@@ -37,8 +37,14 @@ module Murk
         instance_eval(&@block)
       end
 
-      def stack(name)
-        Stack.new(name, env: @env, user: @user)
+      def stack(qname: nil, name: nil)
+        if qname
+          Stack.new(qname: qname)
+        elsif name
+          Stack.new(name: name, env: @env, user: @user)
+        else
+          fail ArgumentError, "Reference parameters should refer to stacks either by qname: or name:"
+        end
       end
 
     end

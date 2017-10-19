@@ -12,6 +12,7 @@ module Murk
 
       def initialize(filename)
         @filename = filename
+        @validated = Hash.new
       end
 
       def path
@@ -44,7 +45,13 @@ module Murk
       end
 
       def validate
-        @validate_output ||= cloudformation.validate_template(template_body: body)
+        if @validated.has_key?(@filename)
+          @validate_output = @validated[@filename]
+        else
+          sleep 0.2
+          @validate_output ||= cloudformation.validate_template(template_body: body)
+          @validated[@filename] = @validate_output
+        end
       rescue Aws::CloudFormation::Errors::ValidationError
         raise TemplateError, "Failed to validate template at #{path}"
       end

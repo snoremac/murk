@@ -5,8 +5,8 @@ RSpec.describe 'StackCollection' do
 
     let(:stacks) do
       [
-        Stack.new('stack1', env: 'uat', user: 'tester'),
-        Stack.new('stack2', env: 'uat', user: 'tester')
+        Stack.new(qname: 'uat-tester-stack1'),
+        Stack.new(qname: 'uat-tester-stack2')
       ]
     end
     let(:stack_collection) { StackCollection.new }

@@ -3,6 +3,8 @@ module Murk
 
     class MurkBuilder
 
+      attr_reader :user
+
       def initialize user
         @options_builder = OptionsBuilder.new
         @stack_builders = []
@@ -23,10 +25,14 @@ module Murk
       end
 
       def stack(name, &block)
-        stack_builder = StackBuilder.new(name, user: @user, env: @current_env)
+        stack_builder = StackBuilder.new(name: name, user: @user, env: @current_env)
         stack_builder.instance_eval(&block)
         @stack_builders << stack_builder
         self
+      end
+
+      def stacks
+        @stacks ||= build
       end
 
       def build

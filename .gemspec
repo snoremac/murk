@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name        = 'murk'
-  spec.version     = '0.3.0'
+  spec.version     = '0.4.0'
   spec.summary     = 'Murk'
   spec.description = 'Murk - Parameterization and environmental partitioning for AWS CloudFormation'
   spec.authors     = ['Cam Smith']
@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.executables = ['murk']
 
   spec.add_runtime_dependency 'api_cache', '~> 0.3'
-  spec.add_runtime_dependency 'aws-sdk', '~> 2.1'
+  spec.add_runtime_dependency 'aws-sdk', '~> 2.6'
   spec.add_runtime_dependency 'json', '~> 1.8'
   spec.add_runtime_dependency 'clamp', '~> 1.0'
 
