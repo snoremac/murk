@@ -103,6 +103,25 @@ RSpec.describe 'Stack' do
       Stack.new(name: 'app', env: 'uat', user: 'tester').create_or_update
     end
 
+    context 'when data is paginated' do
+      before(:each) do
+        allow(cloudformation).to receive(:list_stacks).and_return(
+          list_stacks_with_paging({ 'foo-tester-vpc' => 'CREATE_COMPLETE', 'uat-tester-database' => 'UPDATE_FAILED' },
+                                  { 'uat-tester-vpc' => 'CREATE_COMPLETE', 'uat-tester-database' => 'UPDATE_FAILED' })
+        )
+      end
+
+      it 'should update the stack where one exists with the same qualified name' do
+        expect(cloudformation).to receive(:update_stack).and_return({})
+        Stack.new(name: 'vpc', env: 'uat', user: 'tester').create_or_update
+      end
+
+      it 'should create a new stack when none exists with the same qualified name' do
+        expect(cloudformation).to receive(:create_stack).and_return({})
+        Stack.new(name: 'app', env: 'uat', user: 'tester').create_or_update
+      end
+    end
+
     it 'should refuse to work with a stack in a failed state' do
       expect { Stack.new(name: 'database', env: 'uat', user: 'tester').create_or_update }.to raise_error(StandardError)
     end
