@@ -4,3 +4,5 @@ coverage
 spec.log
 log
 Gemfile.lock
+.bundle
+vendor

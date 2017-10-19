@@ -121,7 +121,6 @@ module Murk
 
       def update
         sleep 0.5
-        $stdout.puts(config)
         cloudformation.update_stack(config)
       rescue Aws::CloudFormation::Errors::ValidationError => e
         if e.message =~ /No updates are to be performed/
@@ -132,12 +131,19 @@ module Murk
       end
 
       def existing
-        sleep 0.2
-        cloudformation.list_stacks(
+        stack = []
+        response = cloudformation.list_stacks(
           stack_status_filter: %w(CREATE_COMPLETE UPDATE_ROLLBACK_COMPLETE UPDATE_COMPLETE))
-          .stack_summaries.select do |stack|
-          stack.stack_name == qualified_name
+        loop do
+          stack = response.stack_summaries.select do |stack|
+            stack.stack_name == qualified_name
+          end
+          break if response.last_page? || stack.any?
+          sleep 0.4
+          response = response.next_page
         end
+
+        stack
       end
 
       def config

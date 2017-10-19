@@ -54,14 +54,23 @@ RSpec.shared_context 'cloudformation stubs' do
     )
   end
 
+  module StubPageableResponse
+    def last_page?
+      true
+    end
+    def next_page
+    end
+  end
+
   def list_stacks_with(stack_statuses)
+
     Seahorse::Client::Response.new(
       data: Aws::CloudFormation::Types::ListStacksOutput.new(
         stack_summaries: stack_statuses.map do |key, value|
           Aws::CloudFormation::Types::StackSummary.new(stack_name: key.to_s, stack_status: value)
         end
       )
-    )
+    ).extend(StubPageableResponse)
   end
 
   def describe_stacks_with(stack_outputs)
